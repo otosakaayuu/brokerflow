@@ -3,37 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Broker Flow Analyzer v1.4 — IDX</title>
+<title>Broker Flow Analyzer v2.0 — IDX</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{--bg:#0a0c0f;--bg2:#111318;--bg3:#181c23;--bg4:#1e232c;--bdr:#2a3040;--bdr2:#3a4455;--tx:#e2e8f0;--tx2:#8899aa;--tx3:#556070;--green:#00d084;--green2:#00a866;--gbg:rgba(0,208,132,0.08);--red:#ff4d6a;--red2:#cc2244;--rbg:rgba(255,77,106,0.08);--blue:#4da6ff;--bbg:rgba(77,166,255,0.08);--amber:#ffb84d;--ambg:rgba(255,184,77,0.08);--acc:#00d084}
+:root{--bg:#0a0c0f;--bg2:#111318;--bg3:#181c23;--bg4:#1e232c;--bdr:#2a3040;--bdr2:#3a4455;--tx:#e2e8f0;--tx2:#8899aa;--tx3:#556070;--green:#00d084;--green2:#00a866;--gbg:rgba(0,208,132,0.08);--red:#ff4d6a;--red2:#cc2244;--rbg:rgba(255,77,106,0.08);--blue:#4da6ff;--bbg:rgba(77,166,255,0.08);--amber:#ffb84d;--ambg:rgba(255,184,77,0.08);--purple:#a78bfa;--pbg:rgba(167,139,250,0.08);--acc:#00d084}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;font-size:13px;min-height:100vh}
-/* HEADER */
-.hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.hdr-l{display:flex;align-items:center;gap:14px}
+.hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px}
+.hdr-l{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .logo{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:var(--acc);letter-spacing:.05em}
 .logo span{color:var(--tx2);font-weight:400}
 .tbadge{background:var(--bg4);border:1px solid var(--bdr2);padding:4px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;display:flex;align-items:center;gap:8px}
 .tbadge .pr{color:var(--green);font-weight:600}
 .hst{font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace}
-/* LAYOUT */
 .main{padding:18px 24px;max-width:1440px;margin:0 auto}
-/* INPUT SECTION */
 .isec{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:18px 22px;margin-bottom:18px}
 .isec-t{font-size:11px;font-weight:600;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;font-family:'IBM Plex Mono',monospace}
-.tabs{display:flex;border-bottom:1px solid var(--bdr);margin-bottom:16px}
-.tab{padding:9px 16px;font-size:11px;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;user-select:none}
+.tabs{display:flex;border-bottom:1px solid var(--bdr);margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:9px 14px;font-size:11px;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;user-select:none}
 .tab:hover{color:var(--tx2)}.tab.on{color:var(--acc);border-bottom-color:var(--acc)}
-/* PASTE TAB */
 .paste-area{width:100%;background:var(--bg3);border:1px solid var(--bdr);color:var(--tx2);padding:10px 12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;resize:vertical;outline:none;min-height:130px;line-height:1.65;transition:border-color .15s}
 .paste-area:focus{border-color:var(--acc)}
+.paste-area.sm{min-height:70px}
 .scale-row{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;font-size:11px;font-family:'IBM Plex Mono',monospace}
 .scale-row label{display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--tx2)}
 .scale-row input[type=radio]{accent-color:var(--acc)}
 .scale-hint{color:var(--amber);font-size:10px}
-/* MANUAL TABLE */
 .mt{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11px}
 .mt th{background:var(--bg3);color:var(--tx3);padding:6px 8px;text-align:left;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bdr);white-space:nowrap}
 .mt td{padding:3px 5px;border-bottom:1px solid var(--bdr)}
@@ -41,65 +37,61 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
 .mt input{background:transparent;border:none;color:var(--tx);font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;padding:4px 5px;outline:none;border-radius:3px}
 .mt input:focus{background:var(--bg4)}
 .mt input.ci{color:var(--blue);font-weight:600;text-transform:uppercase}
-.mt input.nb{color:var(--green)}.mt input.ns{color:var(--red)}
+.mt input.nb{color:var(--green)}.mt input.ns{color:var(--red)}.mt input.fq{color:var(--purple)}
 .cat-sel{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:4px 6px;border-radius:3px;font-size:10px;font-family:'IBM Plex Mono',monospace;outline:none;width:100%}
 .del-btn{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:13px;padding:2px 6px}
 .del-btn:hover{color:var(--red)}
-/* ALERTS */
 .alert{padding:9px 13px;border-radius:4px;font-size:11px;margin-bottom:10px;font-family:'IBM Plex Mono',monospace;line-height:1.65}
 .a-info{background:var(--bbg);color:var(--blue);border:1px solid rgba(77,166,255,.3)}
 .a-ok{background:var(--gbg);color:var(--green);border:1px solid rgba(0,208,132,.3)}
 .a-warn{background:var(--ambg);color:var(--amber);border:1px solid rgba(255,184,77,.3)}
-/* INPUTS */
+.a-pur{background:var(--pbg);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
 .igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
 .ig{display:flex;flex-direction:column;gap:4px}
 .ig label{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono',monospace}
 .ig input{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:7px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;transition:border-color .15s}
 .ig input:focus{border-color:var(--acc)}
 .ig input.s{border-left:2px solid var(--red)}
-/* BUTTONS */
 .br{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
 .btn{padding:8px 20px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s;letter-spacing:.03em}
 .bp{background:var(--acc);color:#000}.bp:hover{background:var(--green2)}
 .bs{background:var(--bg4);color:var(--tx2);border:1px solid var(--bdr2)}.bs:hover{border-color:var(--tx2);color:var(--tx)}
+.bpu{background:var(--purple);color:#1a1530}.bpu:hover{opacity:.85}
 .bsm{padding:4px 10px;font-size:10px}
 .divider{height:1px;background:var(--bdr);margin:12px 0}
-/* KPI */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:18px}
 .kpi{background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;padding:13px 15px;position:relative;overflow:hidden}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.kpi.g::before{background:var(--green)}.kpi.r::before{background:var(--red)}.kpi.b::before{background:var(--blue)}.kpi.a::before{background:var(--amber)}
+.kpi.g::before{background:var(--green)}.kpi.r::before{background:var(--red)}.kpi.b::before{background:var(--blue)}.kpi.a::before{background:var(--amber)}.kpi.p::before{background:var(--purple)}
 .kl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono',monospace;margin-bottom:5px}
 .kv{font-size:21px;font-weight:600;font-family:'IBM Plex Mono',monospace;line-height:1}
-.kv.g{color:var(--green)}.kv.r{color:var(--red)}.kv.b{color:var(--blue)}.kv.a{color:var(--amber)}
+.kv.g{color:var(--green)}.kv.r{color:var(--red)}.kv.b{color:var(--blue)}.kv.a{color:var(--amber)}.kv.p{color:var(--purple)}
 .ks{font-size:10px;color:var(--tx3);margin-top:4px;font-family:'IBM Plex Mono',monospace}
-/* DASH */
 .dash{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
 @media(max-width:900px){.dash{grid-template-columns:1fr}}
 .panel{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
-.ph{padding:11px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.panel.full{margin-bottom:18px}
+.ph{padding:11px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
 .pt{font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.12em;font-family:'IBM Plex Mono',monospace}
 .pb{padding:14px}
-/* FLOW BARS */
 .fi{display:flex;align-items:center;gap:7px;margin-bottom:7px}
 .fc{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;width:32px;padding:2px 4px;border-radius:3px;text-align:center;flex-shrink:0}
 .fc.A{background:rgba(77,166,255,.15);color:var(--blue)}.fc.B{background:rgba(0,208,132,.12);color:var(--green)}.fc.C{background:rgba(136,153,170,.12);color:var(--tx2)}
 .fn{flex:1;color:var(--tx2);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fbt{width:100px;height:11px;background:var(--bg3);border-radius:2px;overflow:hidden;flex-shrink:0}
 .fbf{height:100%;border-radius:2px;transition:width .4s ease}
-.fbf.buy{background:var(--green)}.fbf.sell{background:var(--red)}
-.fa{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;width:72px;text-align:right;flex-shrink:0}
-.fa.buy{color:var(--green)}.fa.sell{color:var(--red)}
-/* SIGNALS */
+.fbf.buy{background:var(--green)}.fbf.sell{background:var(--red)}.fbf.atv{background:var(--purple)}
+.fa{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;width:80px;text-align:right;flex-shrink:0}
+.fa.buy{color:var(--green)}.fa.sell{color:var(--red)}.fa.atv{color:var(--purple)}
 .sig{border-radius:6px;padding:13px 15px;border:1px solid;margin-bottom:10px}
 .sig.bull{background:var(--gbg);border-color:var(--green2)}
 .sig.bear{background:var(--rbg);border-color:var(--red2)}
 .sig.neu{background:var(--bg3);border-color:var(--bdr2)}
 .sig.wat{background:var(--ambg);border-color:#cc8800}
+.sig.pur{background:var(--pbg);border-color:#7c5fd9}
 .sl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-family:'IBM Plex Mono',monospace;margin-bottom:4px}
-.sig.bull .sl{color:var(--green)}.sig.bear .sl{color:var(--red)}.sig.neu .sl{color:var(--tx2)}.sig.wat .sl{color:var(--amber)}
+.sig.bull .sl{color:var(--green)}.sig.bear .sl{color:var(--red)}.sig.neu .sl{color:var(--tx2)}.sig.wat .sl{color:var(--amber)}.sig.pur .sl{color:var(--purple)}
 .st{font-size:12px;color:var(--tx2);line-height:1.6}
-/* DATA TABLE */
 .dt{width:100%;border-collapse:collapse;font-size:11px}
 .dt th{background:var(--bg3);color:var(--tx3);padding:6px 9px;text-align:right;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bdr);font-family:'IBM Plex Mono',monospace}
 .dt th:first-child,.dt th:nth-child(2){text-align:left}
@@ -107,15 +99,12 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
 .dt td:first-child{text-align:left}.dt td:nth-child(2){text-align:left;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dt tr:hover td{background:rgba(255,255,255,.02)}
 .dt .pos{color:var(--green)}.dt .neg{color:var(--red)}
-/* PREVIEW TABLE */
 .prev-t{width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',monospace}
 .prev-t th{background:var(--bg3);color:var(--tx3);padding:5px 8px;text-align:left;border-bottom:1px solid var(--bdr);font-size:10px;text-transform:uppercase;position:sticky;top:0}
 .prev-t td{padding:4px 8px;border-bottom:1px solid var(--bdr);color:var(--tx2)}
 .prev-t .pos{color:var(--green)}.prev-t .neg{color:var(--red)}
-/* BADGE */
 .badge{font-size:10px;padding:2px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:500}
-.badge.buy{background:var(--gbg);color:var(--green)}.badge.sell{background:var(--rbg);color:var(--red)}
-/* SCROLL */
+.badge.buy{background:var(--gbg);color:var(--green)}.badge.sell{background:var(--rbg);color:var(--red)}.badge.warn{background:var(--ambg);color:var(--amber)}.badge.pur{background:var(--pbg);color:var(--purple)}
 .sy{overflow-y:auto;max-height:340px}
 .sy::-webkit-scrollbar{width:4px}
 .sy::-webkit-scrollbar-track{background:var(--bg2)}
@@ -123,12 +112,34 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
 .hidden{display:none!important}
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .fin{animation:fi .25s ease forwards}
-.footer{text-align:center;padding:18px;color:var(--tx3);font-size:10px;font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--bdr);margin-top:24px}
+.footer{text-align:center;padding:18px;color:var(--tx3);font-size:10px;font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--bdr);margin-top:24px;line-height:1.8}
+/* GAUGE */
+.gauge-wrap{margin-bottom:14px}
+.gauge-track{width:100%;height:28px;background:var(--bg3);border-radius:6px;overflow:hidden;display:flex;position:relative;border:1px solid var(--bdr)}
+.gauge-fill{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;transition:width .5s ease;color:#000}
+.gauge-thresh{position:absolute;top:0;bottom:0;width:2px;background:var(--amber)}
+.gauge-label-row{display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:5px}
+/* SNAPSHOT */
+.snap-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--bdr2);border-radius:20px;padding:5px 6px 5px 12px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--tx2);margin:0 6px 6px 0}
+.snap-chip .ts{color:var(--tx3);font-size:9px}
+.snap-chip .x{cursor:pointer;color:var(--tx3);padding:2px 6px;border-radius:50%}
+.snap-chip .x:hover{color:var(--red);background:var(--rbg)}
+.snap-empty{color:var(--tx3);font-size:11px;font-family:'IBM Plex Mono',monospace;padding:8px 0}
+.snap-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+.snap-sel{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:7px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;outline:none;min-width:160px}
+/* QUADRANT */
+.quad-card{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.qc{border-radius:6px;padding:10px 12px;text-align:center;border:1px solid}
+.qc .qn{font-size:18px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.qc .ql{font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono',monospace;margin-top:3px}
+.qc.markup{background:var(--gbg);border-color:var(--green2)}.qc.markup .qn{color:var(--green)}
+.qc.exh{background:var(--ambg);border-color:#cc8800}.qc.exh .qn{color:var(--amber)}
+.qc.abs{background:var(--bbg);border-color:var(--blue)}.qc.abs .qn{color:var(--blue)}
+.qc.mkd{background:var(--rbg);border-color:var(--red2)}.qc.mkd .qn{color:var(--red)}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="hdr">
   <div class="hdr-l">
     <div class="logo">BFA<span>/IDX</span></div>
@@ -143,10 +154,10 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
 <!-- ===================== INPUT SECTION ===================== -->
 <div class="isec">
   <div class="isec-t">Input data broker summary</div>
-
   <div class="tabs">
     <div class="tab on" id="tab-paste" onclick="sw('paste')">Paste TSV</div>
     <div class="tab" id="tab-manual" onclick="sw('manual')">Manual entry</div>
+    <div class="tab" id="tab-vpa" onclick="sw('vpa')">VPA Data</div>
     <div class="tab" id="tab-meta" onclick="sw('meta')">Info saham</div>
     <div class="tab" id="tab-sample" onclick="sw('sample')">Contoh BBCA</div>
   </div>
@@ -154,19 +165,24 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
   <!-- PASTE TAB -->
   <div id="tp-paste">
     <div class="alert a-info">
-      <strong>Format kolom (pisahkan TAB):</strong>&nbsp; Kode &nbsp;|&nbsp; Nama &nbsp;|&nbsp; Lot &nbsp;|&nbsp; NBVal &nbsp;|&nbsp; NSVal<br>
-      Nilai boleh rupiah penuh <code>(5650600000000)</code> atau pakai suffix <code>5650.6B</code> / <code>983.7M</code> / <code>11.3T</code>.<br>
-      Baris header (Kode, NBY, dll) otomatis dilewati. Kode di-trim ke 2 huruf (KZCL→KZ, dll).
+      <strong>Format kolom (pisahkan TAB):</strong>&nbsp; Kode | Nama | Lot | NBVal | NSVal<br>
+      Nilai boleh rupiah penuh (5650600000000) atau suffix 5650.6B / 7.2M. Header otomatis dilewati. Kode di-trim ke 2 huruf.
     </div>
-    <textarea class="paste-area" id="paste-raw" placeholder="Tempel data di sini, contoh:&#10;SQ&#9;BCA Sekuritas&#9;8200000&#9;5650600000000&#9;0&#10;ZP&#9;Maybank Sekuritas&#9;-16800000&#9;0&#9;11386300000000&#10;FO&#9;Forte Global Sekuritas&#9;-10&#9;0&#9;7200000"></textarea>
+    <textarea class="paste-area" id="paste-raw" placeholder="SQ&#9;BCA Sekuritas&#9;8200000&#9;5650600000000&#9;0&#10;ZP&#9;Maybank Sekuritas&#9;-16800000&#9;0&#9;11386300000000"></textarea>
     <div class="scale-row">
       <span style="color:var(--tx3)">Satuan nilai:</span>
       <label><input type="radio" name="sc" value="auto" checked onchange="updateScaleHint()"> Auto-detect</label>
       <label><input type="radio" name="sc" value="rupiah" onchange="updateScaleHint()"> Rupiah penuh (÷1M)</label>
-      <label><input type="radio" name="sc" value="miliar" onchange="updateScaleHint()"> Miliar/B (no division)</label>
+      <label><input type="radio" name="sc" value="miliar" onchange="updateScaleHint()"> Miliar/B</label>
       <span class="scale-hint" id="scale-hint"></span>
     </div>
-    <div id="parse-status"></div>
+
+    <div class="divider"></div>
+    <div style="font-size:10px;color:var(--purple);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Data frekuensi (opsional — untuk ATV/HNWI Detector)</div>
+    <div class="alert a-pur">Format: <code>Kode [TAB] Frekuensi</code>, satu broker per baris. Dipakai untuk menghitung Average Transaction Value (Value ÷ Frekuensi) — mendeteksi broker "ritel" yang sebenarnya HNWI/institusi tersembunyi.</div>
+    <textarea class="paste-area sm" id="freq-raw" placeholder="SQ&#9;74335&#10;ZP&#9;200257&#10;XL&#9;1086857"></textarea>
+
+    <div id="parse-status" style="margin-top:8px"></div>
     <div id="prev-area" class="hidden" style="margin-top:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace">
@@ -188,22 +204,13 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
 
   <!-- MANUAL TAB -->
   <div id="tp-manual" class="hidden">
-    <div class="alert a-info">
-      Masukkan nilai langsung dalam <strong>Miliar IDR (B)</strong>. Contoh: BCA Sekuritas membeli 5650.6B → NBVal=5650.6.<br>
-      Kategori otomatis terisi, bisa diubah manual. Kode broker 2 huruf (SQ, ZP, dll).
-    </div>
+    <div class="alert a-info">Nilai langsung dalam <strong>Miliar IDR (B)</strong>. Kolom Freq opsional untuk ATV.</div>
     <div style="overflow-x:auto;margin-bottom:10px">
       <table class="mt">
-        <thead>
-          <tr>
-            <th style="width:55px">Kode</th>
-            <th style="width:200px">Nama broker</th>
-            <th style="width:100px">Kategori</th>
-            <th style="width:120px">NBVal (B) beli</th>
-            <th style="width:120px">NSVal (B) jual</th>
-            <th style="width:35px"></th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th style="width:55px">Kode</th><th style="width:190px">Nama broker</th><th style="width:95px">Kategori</th>
+          <th style="width:105px">NBVal (B)</th><th style="width:105px">NSVal (B)</th><th style="width:70px">Freq</th><th style="width:35px"></th>
+        </tr></thead>
         <tbody id="manual-tbody"></tbody>
       </table>
     </div>
@@ -214,6 +221,15 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
     </div>
   </div>
 
+  <!-- VPA TAB -->
+  <div id="tp-vpa" class="hidden">
+    <div class="alert a-info">
+      <strong>Volume Price Analysis</strong> — deteksi Exhaustion (Bull Trap) &amp; Absorption (Healthy Retracement).<br>
+      Format: <code>Tanggal [TAB] Close [TAB] Volume</code>, satu baris per hari, urut dari hari paling lama ke terbaru.
+    </div>
+    <textarea class="paste-area" id="vpa-raw" placeholder="01/06/2026&#9;5200&#9;850000000&#10;02/06/2026&#9;5150&#9;620000000&#10;03/06/2026&#9;5075&#9;410000000"></textarea>
+  </div>
+
   <!-- META TAB -->
   <div id="tp-meta" class="hidden">
     <div class="alert a-info">Opsional — lengkapi untuk KPI perubahan harga yang akurat.</div>
@@ -221,17 +237,19 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
       <div class="ig"><label>Kode saham</label><input id="m-ticker" placeholder="BBCA" style="text-transform:uppercase"></div>
       <div class="ig"><label>Dari</label><input id="m-from" placeholder="01/01/2026"></div>
       <div class="ig"><label>Sampai</label><input id="m-to" placeholder="08/06/2026"></div>
-      <div class="ig"><label>FNVal (B) — override</label><input id="m-fn" placeholder="auto-hitung" class="s" type="number"></div>
+      <div class="ig"><label>FNVal (B) override</label><input id="m-fn" placeholder="auto-hitung" class="s" type="number"></div>
       <div class="ig"><label>TVal (B) total</label><input id="m-tv" placeholder="157964" type="number"></div>
       <div class="ig"><label>Harga sekarang</label><input id="m-pr" placeholder="5075" type="number"></div>
       <div class="ig"><label>Harga awal periode</label><input id="m-po" placeholder="8175" type="number"></div>
+      <div class="ig"><label>Threshold ATV (B/transaksi)</label><input id="m-atv" placeholder="1" value="1" type="number" step="0.1"></div>
+      <div class="ig"><label>Whitelist broker (pisah koma)</label><input id="m-whitelist" placeholder="SQ,XL,CC"></div>
     </div>
   </div>
 
   <!-- SAMPLE TAB -->
   <div id="tp-sample" class="hidden">
-    <div class="alert a-info">Klik untuk load data BBCA YTD 2026 (Jan–Jun) sebagai demo lengkap.</div>
-    <button class="btn bp" onclick="loadSample()">Load data BBCA demo</button>
+    <div class="alert a-info">Load data BBCA YTD 2026 + contoh frekuensi &amp; VPA sebagai demo lengkap.</div>
+    <button class="btn bp" onclick="loadSample()">Load data BBCA demo (full)</button>
   </div>
 
   <div class="divider"></div>
@@ -252,7 +270,13 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
   <div class="kpi a"><div class="kl">Sinyal flow</div><div class="kv a" id="k-sig">—</div><div class="ks" id="k-sig2">—</div></div>
 </div>
 
-<!-- ===================== DASHBOARD ===================== -->
+<!-- ===================== CONFLUENCE PANEL ===================== -->
+<div class="panel full" id="confluence-panel" style="display:none">
+  <div class="ph"><span class="pt">Confluence Signal — Bandarmology × ATV × VPA</span></div>
+  <div class="pb" id="confluence-body"></div>
+</div>
+
+<!-- ===================== DASHBOARD (existing flow) ===================== -->
 <div id="dash" style="display:none">
   <div class="dash">
     <div class="panel">
@@ -265,71 +289,111 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
     </div>
   </div>
   <div class="dash">
+    <div class="panel"><div class="ph"><span class="pt">Top net buy</span><span class="badge buy" id="b-buy">—</span></div><div class="pb sy" id="list-buy"></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Top net sell</span><span class="badge sell" id="b-sell">—</span></div><div class="pb sy" id="list-sell"></div></div>
+  </div>
+  <div class="dash">
+    <div class="panel"><div class="ph"><span class="pt">Interpretasi &amp; sinyal</span></div><div class="pb sy" style="max-height:400px" id="sig-area"></div></div>
     <div class="panel">
-      <div class="ph"><span class="pt">Top net buy</span><span class="badge buy" id="b-buy">—</span></div>
-      <div class="pb sy" id="list-buy"></div>
-    </div>
-    <div class="panel">
-      <div class="ph"><span class="pt">Top net sell</span><span class="badge sell" id="b-sell">—</span></div>
-      <div class="pb sy" id="list-sell"></div>
+      <div class="ph"><span class="pt">Tabel lengkap</span><input type="text" id="tsearch" placeholder="Cari kode/nama..." oninput="filterT(this.value)" style="background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:3px 8px;border-radius:3px;font-size:10px;font-family:'IBM Plex Mono',monospace;outline:none;width:140px"></div>
+      <div style="padding:0"><div class="sy"><table class="dt"><thead><tr><th>Kode</th><th>Nama</th><th>Kat</th><th>Net (B)</th><th>Posisi</th></tr></thead><tbody id="tbl-body"></tbody></table></div></div>
     </div>
   </div>
   <div class="dash">
+    <div class="panel"><div class="ph"><span class="pt">Komposisi buy vs sell</span></div><div class="pb"><div style="position:relative;height:240px"><canvas id="ch-donut"></canvas></div></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Net per kategori A / B / C</span></div><div class="pb"><div style="position:relative;height:240px"><canvas id="ch-cbar"></canvas></div></div></div>
+  </div>
+</div>
+
+<!-- ===================== BANDARMOLOGY + ATV ===================== -->
+<div id="bandar-section" style="display:none">
+  <div class="dash">
     <div class="panel">
-      <div class="ph"><span class="pt">Interpretasi &amp; sinyal</span></div>
-      <div class="pb sy" style="max-height:400px" id="sig-area"></div>
-    </div>
-    <div class="panel">
-      <div class="ph">
-        <span class="pt">Tabel lengkap</span>
-        <input type="text" id="tsearch" placeholder="Cari kode/nama..." oninput="filterT(this.value)"
-          style="background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:3px 8px;border-radius:3px;font-size:10px;font-family:'IBM Plex Mono',monospace;outline:none;width:140px">
+      <div class="ph"><span class="pt">Bandarmology Concentration Index</span></div>
+      <div class="pb">
+        <div class="gauge-wrap">
+          <div class="gauge-track"><div class="gauge-fill" id="bandar-fill" style="width:0%;background:var(--green)">0%</div><div class="gauge-thresh" style="left:60%"></div></div>
+          <div class="gauge-label-row"><span>0%</span><span style="color:var(--amber)">Threshold 60%</span><span>100%</span></div>
+        </div>
+        <div id="bandar-detail"></div>
       </div>
-      <div style="padding:0"><div class="sy">
-        <table class="dt">
-          <thead><tr><th>Kode</th><th>Nama</th><th>Kat</th><th>Net (B)</th><th>Posisi</th></tr></thead>
-          <tbody id="tbl-body"></tbody>
-        </table>
-      </div></div>
-    </div>
-  </div>
-  <div class="dash">
-    <div class="panel">
-      <div class="ph"><span class="pt">Komposisi buy vs sell</span></div>
-      <div class="pb"><div style="position:relative;height:240px"><canvas id="ch-donut"></canvas></div></div>
     </div>
     <div class="panel">
-      <div class="ph"><span class="pt">Net per kategori A / B / C</span></div>
-      <div class="pb"><div style="position:relative;height:240px"><canvas id="ch-cbar"></canvas></div></div>
+      <div class="ph"><span class="pt">ATV / HNWI Detector</span><span class="badge pur" id="atv-count">0 flagged</span></div>
+      <div class="pb sy" id="atv-list"></div>
     </div>
   </div>
 </div>
 
+<!-- ===================== VELOCITY / SNAPSHOT MANAGER ===================== -->
+<div class="panel full" id="snap-section" style="display:none">
+  <div class="ph"><span class="pt">Velocity of Accumulation — Snapshot Manager</span></div>
+  <div class="pb">
+    <div class="alert a-pur">Simpan hasil analisis hari ini sebagai snapshot, lalu bandingkan dengan snapshot lain (mis. minggu lalu) untuk melihat akselerasi akumulasi broker tertentu. Snapshot tersimpan selama tab ini terbuka — gunakan Export/Import untuk menyimpan permanen ke file.</div>
+    <div class="snap-row">
+      <div class="ig" style="flex:1;min-width:160px"><label>Label snapshot</label><input id="snap-label" placeholder="08 Jun 2026"></div>
+      <button class="btn bpu" onclick="saveSnapshot()">💾 Simpan snapshot ini</button>
+      <button class="btn bs bsm" onclick="exportAllSnapshots()">⬇ Export semua (.json)</button>
+      <label class="btn bs bsm" style="cursor:pointer">⬆ Import (.json)<input type="file" accept=".json" onchange="importSnapshotFile(this)" style="display:none"></label>
+    </div>
+    <div id="snap-list" class="snap-empty">Belum ada snapshot tersimpan.</div>
+
+    <div class="divider"></div>
+    <div class="snap-row">
+      <div class="ig"><label>Snapshot "Before"</label><select class="snap-sel" id="snap-before"><option value="">— pilih —</option></select></div>
+      <div class="ig"><label>Snapshot "After"</label><select class="snap-sel" id="snap-after"><option value="">— pilih —</option></select></div>
+      <button class="btn bp" onclick="compareSnapshots()">Bandingkan</button>
+    </div>
+    <div id="compare-result"></div>
+  </div>
+</div>
+
+<!-- ===================== VPA QUADRANT ===================== -->
+<div id="vpa-section" style="display:none">
+  <div class="panel full">
+    <div class="ph"><span class="pt">VPA Quadrant — Exhaustion &amp; Absorption Detector</span></div>
+    <div class="pb">
+      <div class="quad-card">
+        <div class="qc markup"><div class="qn" id="qc-markup">0</div><div class="ql">Markup (Valid)</div></div>
+        <div class="qc exh"><div class="qn" id="qc-exh">0</div><div class="ql">Exhaustion (Bull Trap)</div></div>
+        <div class="qc abs"><div class="qn" id="qc-abs">0</div><div class="ql">Absorption (Healthy)</div></div>
+        <div class="qc mkd"><div class="qn" id="qc-mkd">0</div><div class="ql">Markdown (Distribusi)</div></div>
+      </div>
+      <div id="vpa-latest"></div>
+    </div>
+  </div>
+  <div class="dash">
+    <div class="panel"><div class="ph"><span class="pt">Quadrant scatter — ΔPrice vs ΔVolume</span></div><div class="pb"><div style="position:relative;height:280px"><canvas id="ch-vpa"></canvas></div></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Klasifikasi harian</span></div><div class="pb sy" id="vpa-table"></div></div>
+  </div>
+</div>
+
 </div><!-- /main -->
-<div class="footer">BROKER FLOW ANALYZER v1.4 — IDX &nbsp;|&nbsp; 100% offline · no server · free forever &nbsp;|&nbsp; Data source: BEI Broker Summary</div>
+<div class="footer">
+  BROKER FLOW ANALYZER v2.0 — IDX &nbsp;|&nbsp; 100% offline · no server · free forever &nbsp;|&nbsp; Data: BEI Broker Summary<br>
+  <span style="color:var(--tx3)">Bukan rekomendasi investasi. Tools ini membantu visualisasi pola flow &amp; volume — keputusan trading tetap tanggung jawab pengguna.</span>
+</div>
 
 <script>
 // ============================================================
 // GLOBALS
 // ============================================================
 let BD = [], CHT = {}, ROWS = [], activeTab = 'paste';
+let SNAPSHOTS = []; // {id, label, ts, data:[...]}
+let VPA_DATA = [];  // {date, close, vol, pctP, pctV, cls}
 
 // ============================================================
-// CATEGORY MAP (corrected v1.4)
+// CATEGORY MAP
 // ============================================================
 const CAT = {
-  // A = Asing institusional (nilai/lot tinggi, frekuensi rendah)
   YU:'A', AK:'A', ZP:'A', KZ:'A', BB:'A', BK:'A', RX:'A',
-  AI:'A', DX:'A', LG:'A', IF:'A', RF:'A', AG:'A', DP:'A',
-  GW:'A', TP:'A',
-  // B = Hybrid aktif (retail + lokal terbuka, volume aktif)
+  AI:'A', DX:'A', LG:'A', IF:'A', RF:'A', AG:'A', DP:'A', GW:'A', TP:'A',
   XL:'B', CC:'B', YP:'B', PD:'B', XC:'B', MG:'B', CP:'B',
   NI:'B', OD:'B', GR:'B', AZ:'B', KK:'B', HP:'B', DR:'B',
   BQ:'B', XA:'B', MI:'B', KI:'B', RS:'B', EP:'B', AO:'B',
   DH:'B', SQ:'B', LS:'B', HD:'B', RO:'B', YB:'B', PP:'B',
   CD:'B', IN:'B', OK:'B', ES:'B', FS:'B', YJ:'B', PI:'B',
   FO:'B', BS:'B', IH:'B', AT:'B', SS:'B', MU:'B', PC:'B',
-  // C = Kecil / sepi
   PG:'C', RG:'C', SA:'C', IU:'C', YO:'C', AD:'C', RB:'C',
   SF:'C', ZR:'C', AR:'C', ID:'C', II:'C', TS:'C', GA:'C',
   AF:'C', GI:'C', BF:'C', IT:'C', DD:'C', IC:'C', PO:'C',
@@ -338,188 +402,142 @@ const CAT = {
 const getCat = c => CAT[c] || 'B';
 
 // ============================================================
-// NUMBER PARSER — handles suffixes M/B/T and Indonesian format
+// NUMBER PARSER
 // ============================================================
 function parseNum(raw) {
   if (raw === null || raw === undefined || raw === '') return 0;
   let s = String(raw).trim().replace(/\s/g, '');
   if (!s || s === '-' || s === '—' || s === '–') return 0;
-
   const neg = s.startsWith('-');
   s = s.replace(/^[+-]/, '');
-
-  // Suffix multiplier: M=juta, B=miliar, T=triliun
   let mult = 1;
   const sfx = s.match(/^([\d.,]+)([MmBbTt])$/);
-  if (sfx) {
-    s = sfx[1];
-    const f = sfx[2].toUpperCase();
-    mult = f === 'M' ? 1e6 : f === 'B' ? 1e9 : 1e12;
-  }
-
-  // Handle number separators (Indonesian: dots=thousands, comma=decimal)
-  const nd = (s.match(/\./g) || []).length;
-  const nc = (s.match(/,/g) || []).length;
+  if (sfx) { s = sfx[1]; const f = sfx[2].toUpperCase(); mult = f==='M'?1e6:f==='B'?1e9:1e12; }
+  const nd=(s.match(/\./g)||[]).length, nc=(s.match(/,/g)||[]).length;
   let n;
-  if (nd > 1) {                          // 1.234.567
-    n = parseFloat(s.replace(/\./g, ''));
-  } else if (nc > 1) {                   // 1,234,567
-    n = parseFloat(s.replace(/,/g, ''));
-  } else if (nd === 1 && nc === 1) {
-    n = s.lastIndexOf('.') > s.lastIndexOf(',')
-      ? parseFloat(s.replace(',', ''))           // 1,234.56
-      : parseFloat(s.replace('.','').replace(',','.')); // 1.234,56
-  } else if (nc === 1) {
-    // comma: decimal (1.5 → ok) or thousands (1,500 → strip)
-    const after = s.split(',')[1];
-    n = (after && after.length <= 2)
-      ? parseFloat(s.replace(',', '.'))
-      : parseFloat(s.replace(',', ''));
-  } else {
-    n = parseFloat(s);
-  }
-
+  if (nd>1) n=parseFloat(s.replace(/\./g,''));
+  else if (nc>1) n=parseFloat(s.replace(/,/g,''));
+  else if (nd===1&&nc===1) n = s.lastIndexOf('.')>s.lastIndexOf(',') ? parseFloat(s.replace(',','')) : parseFloat(s.replace('.','').replace(',','.'));
+  else if (nc===1) { const after=s.split(',')[1]; n=(after&&after.length<=2)?parseFloat(s.replace(',','.')):parseFloat(s.replace(',','')); }
+  else n=parseFloat(s);
   if (isNaN(n)) return 0;
-  return (neg ? -1 : 1) * n * mult;
+  return (neg?-1:1)*n*mult;
 }
 
-// ============================================================
-// SCALE DETECTION
-// KEY FIX: if max abs value >= 1e8 (100 juta), it's full rupiah → divide by 1e9
-// This correctly handles FO=7200000 (0.0072B) in a dataset with ZP=11.386T
-// ============================================================
 function detectScale(rawNBs, rawNSs) {
-  const override = document.querySelector('input[name=sc]:checked')?.value || 'auto';
-  if (override === 'rupiah') return 1e9;
-  if (override === 'miliar') return 1;
-  // Auto: use dataset max
-  const vals = [...rawNBs, ...rawNSs].map(Math.abs).filter(v => v > 0);
+  const ov = document.querySelector('input[name=sc]:checked')?.value || 'auto';
+  if (ov==='rupiah') return 1e9;
+  if (ov==='miliar') return 1;
+  const vals=[...rawNBs,...rawNSs].map(Math.abs).filter(v=>v>0);
   if (!vals.length) return 1;
-  const mx = Math.max(...vals);
-  return mx >= 1e8 ? 1e9 : 1;
+  return Math.max(...vals) >= 1e8 ? 1e9 : 1;
 }
 
 // ============================================================
-// PARSE TSV
+// PARSE TSV (broker data)
 // ============================================================
 function parseTSV(text) {
-  const lines = text.trim().split('\n').filter(l => l.trim());
-  if (!lines.length) return { rows: [], scale: 1, warns: [] };
-
+  const lines = text.trim().split('\n').filter(l=>l.trim());
+  if (!lines.length) return { rows:[], scale:1, warns:[] };
   const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
-
-  // Header detection
-  const firstCells = lines[0].split(sep);
-  const fc = firstCells[0].trim().replace(/[^A-Za-z]/g,'').toUpperCase();
-  const startIdx = (fc.length > 4 || ['KODE','NBY','NSL','CODE','NO'].includes(fc)) ? 1 : 0;
-
-  const rawRows = [], warns = [];
-
-  for (let i = startIdx; i < lines.length; i++) {
-    const parts = lines[i].split(sep).map(p => p.trim());
-    if (parts.length < 2) continue;
-
-    // Code: strip non-letters, uppercase, take first 2
+  const fc = lines[0].split(sep)[0].trim().replace(/[^A-Za-z]/g,'').toUpperCase();
+  const startIdx = (fc.length>4 || ['KODE','NBY','NSL','CODE','NO'].includes(fc)) ? 1 : 0;
+  const rawRows=[], warns=[];
+  for (let i=startIdx;i<lines.length;i++) {
+    const parts = lines[i].split(sep).map(p=>p.trim());
+    if (parts.length<2) continue;
     const rawC = parts[0].replace(/[^A-Za-z]/g,'').toUpperCase();
     const code = rawC.slice(0,2);
-    if (code.length < 2) { warns.push('Baris '+(i+1)+': kode "'+parts[0]+'" tidak valid'); continue; }
-
-    // Find where numeric columns begin
-    let numStart = -1, nameEnd = 1;
-    for (let j = 1; j < parts.length; j++) {
+    if (code.length<2) { warns.push('Baris '+(i+1)+': kode "'+parts[0]+'" tidak valid'); continue; }
+    let numStart=-1, nameEnd=1;
+    for (let j=1;j<parts.length;j++) {
       const c = parts[j].replace(/[\s,\.]/g,'').replace(/^-/,'');
-      // Matches digits possibly with suffix
-      if (/^[\d]+[MBT]?$/.test(c) || /^[\d]+\.[\d]*[MBT]?$/.test(c.replace(',','.'))) {
-        numStart = j; nameEnd = j; break;
-      }
+      if (/^[\d]+[MBT]?$/.test(c) || /^[\d]+\.[\d]*[MBT]?$/.test(c.replace(',','.'))) { numStart=j; nameEnd=j; break; }
     }
-    if (numStart < 0) { warns.push('Baris '+(i+1)+': tidak ada kolom numerik'); continue; }
-
-    const name = parts.slice(1, nameEnd).join(' ').trim() || code;
+    if (numStart<0) { warns.push('Baris '+(i+1)+': tidak ada kolom numerik'); continue; }
+    const name = parts.slice(1,nameEnd).join(' ').trim() || code;
     const nums = parts.slice(numStart).map(parseNum);
-
-    // Map columns
-    // 3 nums: lot, nbval, nsval
-    // 4 nums: lot, nbval, nslot, nsval
-    // 5+ nums: lot, nbval, bavg, nslot, nsval...
-    let lot = 0, rNB = 0, rNS = 0;
-    if      (nums.length >= 5) { lot=nums[0]; rNB=nums[1]; rNS=nums[4]; }
-    else if (nums.length === 4) { lot=nums[0]; rNB=nums[1]; rNS=nums[3]; }
-    else if (nums.length === 3) { lot=nums[0]; rNB=nums[1]; rNS=nums[2]; }
-    else if (nums.length === 2) { rNB=nums[0]; rNS=nums[1]; }
-    else                        { rNB=nums[0]; }
-
+    let lot=0, rNB=0, rNS=0;
+    if (nums.length>=5) { lot=nums[0]; rNB=nums[1]; rNS=nums[4]; }
+    else if (nums.length===4) { lot=nums[0]; rNB=nums[1]; rNS=nums[3]; }
+    else if (nums.length===3) { lot=nums[0]; rNB=nums[1]; rNS=nums[2]; }
+    else if (nums.length===2) { rNB=nums[0]; rNS=nums[1]; }
+    else { rNB=nums[0]; }
     rawRows.push({ c:code, n:name, cat:getCat(code), lot, rNB:Math.abs(rNB), rNS:Math.abs(rNS) });
   }
-
-  // *** KEY FIX: detect scale from ALL values in dataset ***
   const scale = detectScale(rawRows.map(r=>r.rNB), rawRows.map(r=>r.rNS));
-
-  const rows = rawRows.map(r => ({
-    c:r.c, n:r.n, cat:r.cat, lot:r.lot,
-    nb: r.rNB / scale,
-    ns: r.rNS / scale,
-  }));
-
+  const rows = rawRows.map(r=>({ c:r.c, n:r.n, cat:r.cat, lot:r.lot, nb:r.rNB/scale, ns:r.rNS/scale, freq:0 }));
   return { rows, scale, warns };
 }
 
 // ============================================================
-// PARSE MANUAL (values already in B)
+// PARSE FREQUENCY (auxiliary)
+// ============================================================
+function parseFreqText(text) {
+  const map = {};
+  if (!text || !text.trim()) return map;
+  const lines = text.trim().split('\n').filter(l=>l.trim());
+  lines.forEach(l => {
+    const sep = l.includes('\t') ? '\t' : /\s{2,}|,/;
+    const parts = l.split(sep).map(p=>p.trim());
+    if (parts.length<2) return;
+    const code = parts[0].replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,2);
+    const freq = parseNum(parts[1]);
+    if (code.length===2 && freq>0) map[code]=freq;
+  });
+  return map;
+}
+
+// ============================================================
+// PARSE MANUAL
 // ============================================================
 function parseManual() {
-  const rows = [];
-  document.querySelectorAll('#manual-tbody tr').forEach(tr => {
+  const rows=[];
+  document.querySelectorAll('#manual-tbody tr').forEach(tr=>{
     const inp = tr.querySelectorAll('input');
     const sel = tr.querySelector('select');
     const code = (inp[0]?.value||'').trim().toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);
-    if (code.length < 2) return;
+    if (code.length<2) return;
     const name = (inp[1]?.value||'').trim() || code;
     const cat  = sel?.value || getCat(code);
     const nb   = Math.abs(parseFloat(inp[2]?.value)||0);
     const ns   = Math.abs(parseFloat(inp[3]?.value)||0);
-    rows.push({ c:code, n:name, cat, nb, ns });
+    const freq = Math.abs(parseFloat(inp[4]?.value)||0);
+    rows.push({ c:code, n:name, cat, nb, ns, freq });
   });
   return rows;
 }
 
-// ============================================================
-// SCALE HINT UPDATE
-// ============================================================
 function updateScaleHint() {
   const raw = document.getElementById('paste-raw').value;
   if (!raw.trim()) { document.getElementById('scale-hint').textContent=''; return; }
   const val = document.querySelector('input[name=sc]:checked')?.value || 'auto';
-  if (val === 'auto') {
-    // Quick scan for max
+  if (val==='auto') {
     const nums = raw.match(/-?[\d.]+[MBT]?/g) || [];
     const maxV = Math.max(0, ...nums.map(parseNum).map(Math.abs));
-    const scaleGuess = maxV >= 1e8 ? 'Rupiah penuh (÷1M)' : 'Miliar/B';
-    document.getElementById('scale-hint').textContent = '→ Terdeteksi: '+scaleGuess;
-  } else {
-    document.getElementById('scale-hint').textContent = '';
-  }
+    document.getElementById('scale-hint').textContent = '→ Terdeteksi: '+(maxV>=1e8?'Rupiah penuh (÷1M)':'Miliar/B');
+  } else document.getElementById('scale-hint').textContent='';
 }
 
 // ============================================================
 // TABS
 // ============================================================
 function sw(id) {
-  ['paste','manual','meta','sample'].forEach(t => {
+  ['paste','manual','vpa','meta','sample'].forEach(t=>{
     document.getElementById('tp-'+t).classList.add('hidden');
     document.getElementById('tab-'+t).classList.remove('on');
   });
   document.getElementById('tp-'+id).classList.remove('hidden');
   document.getElementById('tab-'+id).classList.add('on');
-  activeTab = id;
+  if (['paste','manual'].includes(id)) activeTab = id;
 }
 
 // ============================================================
 // MANUAL TABLE
 // ============================================================
 function addMRow(n, data) {
-  if (typeof n === 'number' && n > 1) { for(let i=0;i<n;i++) addMRow(1,null); return; }
-  const d = data || {};
+  if (typeof n==='number' && n>1) { for(let i=0;i<n;i++) addMRow(1,null); return; }
+  const d = data||{};
   const tb = document.getElementById('manual-tbody');
   const tr = document.createElement('tr');
   const cat = d.cat || getCat((d.c||'').toUpperCase()) || 'B';
@@ -533,21 +551,17 @@ function addMRow(n, data) {
     </select></td>
     <td><input class="nb" type="number" value="${d.nb||''}" placeholder="0" step="0.1" min="0"></td>
     <td><input class="ns" type="number" value="${d.ns||''}" placeholder="0" step="0.1" min="0"></td>
+    <td><input class="fq" type="number" value="${d.freq||''}" placeholder="0" step="1" min="0"></td>
     <td><button class="del-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
   tb.appendChild(tr);
 }
-
 function autoCat(inp) {
   const code = inp.value.trim().toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);
-  if (code.length < 2) return;
+  if (code.length<2) return;
   const sel = inp.closest('tr').querySelector('select');
   if (sel) sel.value = getCat(code);
 }
-
-function clearManual() {
-  document.getElementById('manual-tbody').innerHTML = '';
-  for(let i=0;i<8;i++) addMRow();
-}
+function clearManual() { document.getElementById('manual-tbody').innerHTML=''; for(let i=0;i<8;i++) addMRow(); }
 
 // ============================================================
 // SAMPLE DATA
@@ -562,30 +576,6 @@ DX\tBahana Sekuritas\t1600000\t1115600000000\t0
 NI\tBNI Sekuritas\t1500000\t998800000000\t0
 LG\tTrimegah Sekuritas\t1400000\t927100000000\t0
 GR\tPanin Sekuritas\t1400000\t926000000000\t0
-OD\tDanareksa Sekuritas\t1200000\t816000000000\t0
-KK\tPhillip Sekuritas\t1100000\t720100000000\t0
-AZ\tSucor Sekuritas\t1000000\t719200000000\t0
-CP\tValbury Sekuritas\t938047\t629100000000\t0
-AI\tKay Hian Sekuritas\t597436\t410100000000\t0
-DR\tRHB Sekuritas\t558614\t375400000000\t0
-DH\tSinarmas Sekuritas\t565344\t355100000000\t0
-EP\tMNC Sekuritas\t482991\t318100000000\t0
-RF\tBuana Capital Sekuritas\t465775\t277400000000\t0
-BQ\tKorea Investment Sekuritas\t371849\t235600000000\t0
-XA\tNH Korindo Sekuritas\t328303\t205800000000\t0
-KI\tCiptadana Sekuritas\t318320\t203900000000\t0
-AO\tErdikha Elit Sekuritas\t329752\t202200000000\t0
-DP\tDBS Vickers Sekuritas\t284652\t175100000000\t0
-MG\tSemesta Indovest\t285920\t171800000000\t0
-PP\tAldiracita Sekuritas\t230274\t142500000000\t0
-YJ\tLotus Andalan Sekuritas\t190696\t122400000000\t0
-IF\tSamuel Sekuritas\t199716\t117400000000\t0
-OK\tNet Sekuritas\t149565\t101400000000\t0
-LS\tReliance Sekuritas\t141442\t93000000000\t0
-ES\tEkokapital Sekuritas\t106617\t69600000000\t0
-YB\tJasa Utama Capital\t104227\t67500000000\t0
-HP\tHenan Putihrai Sekuritas\t95914\t63500000000\t0
-FS\tYuanta Sekuritas\t93996\t60700000000\t0
 ZP\tMaybank Sekuritas\t-16800000\t0\t11386300000000
 AK\tUBS Sekuritas\t-8500000\t0\t5828700000000
 KZ\tCLSA Sekuritas\t-6700000\t0\t4440900000000
@@ -595,17 +585,30 @@ BB\tVerdhana Sekuritas\t-853312\t0\t674400000000
 BK\tJP Morgan Sekuritas\t-818358\t0\t627000000000
 AG\tKiwoom Sekuritas\t-705246\t0\t441100000000
 TP\tOCBC Sekuritas\t-619063\t0\t294400000000
-AD\tSukadana Prima\t-10393\t0\t7100000000
-YO\tAmantara Sekuritas\t-6670\t0\t5200000000
-GW\tGuotai Junan Sekuritas\t-3975\t0\t3200000000
-IU\tIndo Capital Sekuritas\t-4130\t0\t2900000000
-PI\tMagenta Kapital Sekuritas\t-1795\t0\t1500000000
-FO\tForte Global Sekuritas\t-10\t0\t7200000`;
+FO\tForte Global Sekuritas\t-10\t0\t7200000
+YO\tAmantara Sekuritas\t-2200\t0\t185000000000`;
+
+const SAMPLE_FREQ = `SQ\t74335
+ZP\t200257
+XL\t1086857
+AK\t447098
+YO\t850
+CC\t416376
+FO\t306`;
+
+const SAMPLE_VPA = `02/06/2026\t6200\t610000000
+03/06/2026\t6050\t580000000
+04/06/2026\t5900\t720000000
+05/06/2026\t5850\t340000000
+06/06/2026\t5700\t290000000
+08/06/2026\t5075\t950000000`;
 
 const SAMPLE_META = { tk:'BBCA', from:'01/01/2026', to:'08/06/2026', fn:-32606.3, tv:157964, pr:5075, po:8175 };
 
 function loadSample() {
   document.getElementById('paste-raw').value = SAMPLE_TSV;
+  document.getElementById('freq-raw').value  = SAMPLE_FREQ;
+  document.getElementById('vpa-raw').value   = SAMPLE_VPA;
   document.getElementById('m-ticker').value  = SAMPLE_META.tk;
   document.getElementById('m-from').value    = SAMPLE_META.from;
   document.getElementById('m-to').value      = SAMPLE_META.to;
@@ -613,7 +616,8 @@ function loadSample() {
   document.getElementById('m-tv').value      = SAMPLE_META.tv;
   document.getElementById('m-pr').value      = SAMPLE_META.pr;
   document.getElementById('m-po').value      = SAMPLE_META.po;
-  sw('paste');
+  document.getElementById('m-whitelist').value = 'SQ,XL,CC';
+  sw('paste'); activeTab='paste';
   updateScaleHint();
   doAnalysis();
 }
@@ -622,27 +626,33 @@ function loadSample() {
 // RESET
 // ============================================================
 function resetAll() {
-  BD = []; ROWS = [];
-  document.getElementById('paste-raw').value = '';
-  document.getElementById('parse-status').innerHTML = '';
+  BD=[]; ROWS=[]; VPA_DATA=[];
+  document.getElementById('paste-raw').value='';
+  document.getElementById('freq-raw').value='';
+  document.getElementById('vpa-raw').value='';
+  document.getElementById('parse-status').innerHTML='';
   document.getElementById('prev-area').classList.add('hidden');
-  document.getElementById('kpis').style.display = 'none';
-  document.getElementById('dash').style.display  = 'none';
-  document.getElementById('hst').textContent = 'SIAP — MASUKKAN DATA LALU KLIK ANALISIS';
-  ['hdr-tk','hdr-pr','hdr-chg','hdr-pd'].forEach(id => $(id).textContent = id==='hdr-pd'?'Belum ada data':'—');
-  $('last-run').textContent = '';
-  $('scale-hint').textContent = '';
+  document.getElementById('kpis').style.display='none';
+  document.getElementById('dash').style.display='none';
+  document.getElementById('bandar-section').style.display='none';
+  document.getElementById('vpa-section').style.display='none';
+  document.getElementById('confluence-panel').style.display='none';
+  document.getElementById('hst').textContent='SIAP — MASUKKAN DATA LALU KLIK ANALISIS';
+  ['hdr-tk','hdr-pr','hdr-chg'].forEach(id=>$(id).textContent='—');
+  $('hdr-pd').textContent='Belum ada data';
+  $('last-run').textContent='';
+  $('scale-hint').textContent='';
   Object.values(CHT).forEach(c=>{try{c.destroy();}catch(e){}});
-  CHT = {};
+  CHT={};
 }
 
 // ============================================================
 // MAIN ANALYSIS TRIGGER
 // ============================================================
 function doAnalysis() {
-  let rows = [], scale = 1, warns = [];
+  let rows=[], scale=1, warns=[];
 
-  if (activeTab === 'manual') {
+  if (activeTab==='manual') {
     rows = parseManual();
     if (!rows.length) { showStatus('warn','⚠ Tabel manual kosong. Isi dulu minimal 1 baris.'); return; }
   } else {
@@ -650,41 +660,71 @@ function doAnalysis() {
     if (!raw.trim()) { showStatus('warn','⚠ Textarea kosong! Paste data broker dulu.'); return; }
     const result = parseTSV(raw);
     rows = result.rows; scale = result.scale; warns = result.warns;
-    if (!rows.length) { showStatus('warn','⚠ Tidak ada data valid. Periksa format: Kode [TAB] Nama [TAB] Lot [TAB] NBVal [TAB] NSVal'); return; }
+    if (!rows.length) { showStatus('warn','⚠ Tidak ada data valid. Periksa format kolom.'); return; }
 
-    // Show preview
-    const buyers  = rows.filter(r => r.nb > r.ns);
-    const sellers = rows.filter(r => r.ns >= r.nb);
-    $('prev-cnt').textContent   = rows.length;
-    $('prev-buys').textContent  = buyers.length+' buy';
-    $('prev-sells').textContent = sellers.length+' sell';
-    $('prev-warns').textContent = warns.length ? warns.length+' baris dilewati' : '';
-    $('prev-scale').textContent = scale===1e9 ? 'Rupiah penuh (÷1M)' : 'Miliar/B';
-
-    $('prev-body').innerHTML = rows.map(r => {
-      const net = r.nb - r.ns;
-      return `<tr>
-        <td style="color:${r.cat==='A'?'var(--blue)':r.cat==='B'?'var(--green)':'var(--tx3)'};font-weight:600">${r.c}</td>
-        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.n}</td>
-        <td style="color:${r.cat==='A'?'var(--blue)':r.cat==='B'?'var(--green)':'var(--tx3)'}">${r.cat}</td>
-        <td class="${r.nb>0?'pos':''}" style="text-align:right">${r.nb>0?'+'+fB(r.nb):'—'}</td>
-        <td class="${r.ns>0?'neg':''}" style="text-align:right">${r.ns>0?'-'+fB(r.ns):'—'}</td>
-        <td class="${net>0?'pos':'neg'}" style="text-align:right">${(net>=0?'+':'')+fB(net)}</td>
-      </tr>`;
+    const buyers = rows.filter(r=>r.nb>r.ns), sellers = rows.filter(r=>r.ns>=r.nb);
+    $('prev-cnt').textContent=rows.length; $('prev-buys').textContent=buyers.length+' buy';
+    $('prev-sells').textContent=sellers.length+' sell'; $('prev-warns').textContent=warns.length?warns.length+' baris dilewati':'';
+    $('prev-scale').textContent = scale===1e9?'Rupiah penuh (÷1M)':'Miliar/B';
+    $('prev-body').innerHTML = rows.map(r=>{
+      const net=r.nb-r.ns;
+      return `<tr><td style="color:${r.cat==='A'?'var(--blue)':r.cat==='B'?'var(--green)':'var(--tx3)'};font-weight:600">${r.c}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.n}</td>
+      <td style="color:${r.cat==='A'?'var(--blue)':r.cat==='B'?'var(--green)':'var(--tx3)'}">${r.cat}</td>
+      <td class="${r.nb>0?'pos':''}" style="text-align:right">${r.nb>0?'+'+fB(r.nb):'—'}</td>
+      <td class="${r.ns>0?'neg':''}" style="text-align:right">${r.ns>0?'-'+fB(r.ns):'—'}</td>
+      <td class="${net>0?'pos':'neg'}" style="text-align:right">${(net>=0?'+':'')+fB(net)}</td></tr>`;
     }).join('');
-
     document.getElementById('prev-area').classList.remove('hidden');
     showStatus('ok','✓ '+rows.length+' broker ter-parse | skala: '+(scale===1e9?'Rupiah ÷1M':'Miliar')+(warns.length?' | '+warns.length+' dilewati':''));
   }
 
-  BD = rows.map(r => ({...r, net:r.nb-r.ns, buy:(r.nb-r.ns)>=0}));
+  // merge frequency
+  const freqMap = parseFreqText(document.getElementById('freq-raw').value);
+  rows = rows.map(r => ({...r, freq: r.freq || freqMap[r.c] || 0 }));
+
+  BD = rows.map(r=>({...r, net:r.nb-r.ns, buy:(r.nb-r.ns)>=0}));
+
+  // parse VPA if filled
+  VPA_DATA = parseVPA(document.getElementById('vpa-raw').value);
+
   run();
 }
 
-function showStatus(type, msg) {
+function showStatus(type,msg) {
   const c = type==='warn'?'a-warn':type==='ok'?'a-ok':'a-info';
   $('parse-status').innerHTML = '<div class="alert '+c+'" style="margin-top:8px">'+msg+'</div>';
 }
+
+// ============================================================
+// VPA PARSER
+// ============================================================
+function parseVPA(text) {
+  if (!text || !text.trim()) return [];
+  const lines = text.trim().split('\n').filter(l=>l.trim());
+  const days = lines.map(l=>{
+    const sep = l.includes('\t')?'\t':/\s{2,}|,/;
+    const p = l.split(sep).map(x=>x.trim());
+    return { date:p[0], close:parseNum(p[1]), vol:parseNum(p[2]) };
+  }).filter(d=>d.date && d.close>0);
+
+  const out=[];
+  for (let i=1;i<days.length;i++) {
+    const prev=days[i-1], cur=days[i];
+    const pctP = prev.close ? ((cur.close-prev.close)/prev.close*100) : 0;
+    const pctV = prev.vol ? ((cur.vol-prev.vol)/prev.vol*100) : 0;
+    let cls;
+    if (pctP>=0 && pctV>=0) cls='markup';
+    else if (pctP>=0 && pctV<0) cls='exh';
+    else if (pctP<0 && pctV<0) cls='abs';
+    else cls='mkd';
+    out.push({ date:cur.date, close:cur.close, vol:cur.vol, pctP, pctV, cls });
+  }
+  return out;
+}
+
+const VPA_LABEL = { markup:'Markup (Valid)', exh:'Exhaustion (Bull Trap)', abs:'Absorption (Healthy)', mkd:'Markdown (Distribusi)' };
+const VPA_COLOR = { markup:'#00d084', exh:'#ffb84d', abs:'#4da6ff', mkd:'#ff4d6a' };
 
 // ============================================================
 // RUN ANALYSIS
@@ -693,62 +733,62 @@ function run() {
   if (!BD.length) return;
 
   const ticker = ($('m-ticker').value||'SAHAM').toUpperCase();
-  const dfrom  = $('m-from').value || '—';
-  const dto    = $('m-to').value   || '—';
-  const fnIn   = parseFloat($('m-fn').value);
-  const tv     = parseFloat($('m-tv').value)||0;
-  const pr     = parseFloat($('m-pr').value)||0;
-  const po     = parseFloat($('m-po').value)||0;
+  const dfrom = $('m-from').value||'—', dto = $('m-to').value||'—';
+  const fnIn = parseFloat($('m-fn').value);
+  const tv = parseFloat($('m-tv').value)||0;
+  const pr = parseFloat($('m-pr').value)||0;
+  const po = parseFloat($('m-po').value)||0;
+  const atvThresh = parseFloat($('m-atv').value)||1;
+  const whitelist = ($('m-whitelist').value||'').toUpperCase().split(',').map(s=>s.trim()).filter(Boolean);
 
-  const buyers  = BD.filter(b=>b.buy);
-  const sellers = BD.filter(b=>!b.buy);
-  const tbuy    = buyers.reduce((s,b)=>s+b.net,0);
-  const tsell   = sellers.reduce((s,b)=>s+Math.abs(b.net),0);
-  const fnAuto  = BD.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
-  const fn      = !isNaN(fnIn) ? fnIn : fnAuto;
-  const pchg    = po ? ((pr-po)/po*100) : 0;
-  const pabs    = pr - po;
+  const buyers=BD.filter(b=>b.buy), sellers=BD.filter(b=>!b.buy);
+  const tbuy=buyers.reduce((s,b)=>s+b.net,0), tsell=sellers.reduce((s,b)=>s+Math.abs(b.net),0);
+  const fnAuto=BD.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
+  const fn = !isNaN(fnIn)?fnIn:fnAuto;
+  const pchg = po?((pr-po)/po*100):0, pabs=pr-po;
 
-  $('hdr-tk').textContent  = ticker;
-  $('hdr-pr').textContent  = pr ? pr.toLocaleString('id') : '—';
-  $('hdr-chg').textContent = (pr&&po) ? (pchg>=0?'+':'')+pchg.toFixed(2)+'%' : '—';
-  $('hdr-chg').style.color = pchg>=0 ? 'var(--green)' : 'var(--red)';
-  $('hdr-pd').textContent  = dfrom+' → '+dto;
-  $('hst').textContent     = 'RUN: '+new Date().toLocaleTimeString('id');
-  $('last-run').textContent= 'Analisis: '+new Date().toLocaleString('id');
+  $('hdr-tk').textContent=ticker;
+  $('hdr-pr').textContent=pr?pr.toLocaleString('id'):'—';
+  $('hdr-chg').textContent=(pr&&po)?(pchg>=0?'+':'')+pchg.toFixed(2)+'%':'—';
+  $('hdr-chg').style.color=pchg>=0?'var(--green)':'var(--red)';
+  $('hdr-pd').textContent=dfrom+' → '+dto;
+  $('hst').textContent='RUN: '+new Date().toLocaleTimeString('id');
+  $('last-run').textContent='Analisis: '+new Date().toLocaleString('id');
 
-  document.getElementById('kpis').style.display = 'grid';
-  document.getElementById('dash').style.display  = 'block';
+  document.getElementById('kpis').style.display='grid';
+  document.getElementById('dash').style.display='block';
+  document.getElementById('bandar-section').style.display='block';
+  document.getElementById('snap-section').style.display='block';
 
-  // KPIs
-  set('k-tv',  tv ? fB(tv) : fB(tbuy+tsell));
-  set('k-tv2', 'Periode '+dfrom+' – '+dto);
+  set('k-tv', tv?fB(tv):fB(tbuy+tsell)); set('k-tv2','Periode '+dfrom+' – '+dto);
   const fc=fn>=0?'g':'r';
-  $('k-fn').textContent=$('k-fn').className=''; // reset
-  $('k-fn').textContent  = (fn>=0?'+':'')+fB(fn);
-  $('k-fn').className    = 'kv '+fc;
-  $('k-fn-c').className  = 'kpi '+fc;
+  $('k-fn').textContent=(fn>=0?'+':'')+fB(fn); $('k-fn').className='kv '+fc; $('k-fn-c').className='kpi '+fc;
   set('k-fn2', fn<0?'Asing net keluar':'Asing net masuk');
   const pc=pchg>=0?'g':'r';
-  $('k-pc').textContent  = (pr&&po)?(pchg>=0?'+':'')+pchg.toFixed(1)+'%':'—';
-  $('k-pc').className    = 'kv '+(pr&&po?pc:'b');
-  $('k-pc-c').className  = 'kpi '+(pr&&po?pc:'b');
-  set('k-pc2', (pr&&po) ? fPt(pabs)+' poin | '+fN(po)+' → '+fN(pr) : 'Isi harga di tab Info Saham');
-  set('k-bc',  buyers.length+'');
-  set('k-bc2', '+'+fB(tbuy)+' total');
-  set('k-sc',  sellers.length+'');
-  set('k-sc2', '-'+fB(tsell)+' total');
-  const sig = getSig(fn,pchg,tbuy,tsell,BD);
-  set('k-sig',  sig.l);
-  set('k-sig2', sig.s);
+  $('k-pc').textContent=(pr&&po)?(pchg>=0?'+':'')+pchg.toFixed(1)+'%':'—';
+  $('k-pc').className='kv '+(pr&&po?pc:'b'); $('k-pc-c').className='kpi '+(pr&&po?pc:'b');
+  set('k-pc2', (pr&&po)?fPt(pabs)+' poin | '+fN(po)+' → '+fN(pr):'Isi harga di tab Info Saham');
+  set('k-bc', buyers.length+''); set('k-bc2','+'+fB(tbuy)+' total');
+  set('k-sc', sellers.length+''); set('k-sc2','-'+fB(tsell)+' total');
+  const sig=getSig(fn,pchg,tbuy,tsell,BD);
+  set('k-sig', sig.l); set('k-sig2', sig.s);
 
-  buildFlow(BD);
-  buildCat(BD);
-  buildDonut(tbuy,tsell);
-  buildCbar(BD);
-  buildLists(buyers,sellers,tbuy,tsell);
-  buildTable(BD);
-  buildSigs(fn,pchg,BD,sig);
+  buildFlow(BD); buildCat(BD); buildDonut(tbuy,tsell); buildCbar(BD);
+  buildLists(buyers,sellers,tbuy,tsell); buildTable(BD); buildSigs(fn,pchg,BD,sig);
+
+  const bandar = buildBandar(BD);
+  const atvFlags = buildATV(BD, atvThresh);
+  renderSnapshotList(); renderCompareSelects();
+
+  let vpaLatest = null;
+  if (VPA_DATA.length) {
+    document.getElementById('vpa-section').style.display='block';
+    vpaLatest = buildVPA(VPA_DATA);
+  } else {
+    document.getElementById('vpa-section').style.display='none';
+  }
+
+  buildConfluence(bandar, atvFlags, vpaLatest, whitelist, BD);
 
   document.getElementById('kpis').scrollIntoView({behavior:'smooth'});
 }
@@ -759,16 +799,16 @@ function run() {
 function getSig(fn,pct,buy,sell,data) {
   const an=data.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
   const bn=data.filter(b=>b.cat==='B').reduce((s,b)=>s+b.net,0);
-  if (fn>0&&pct>0)               return{l:'BULLISH',   s:'Asing masuk + harga naik',       t:'bull'};
-  if (fn>0&&pct<=0)              return{l:'AKUMULASI', s:'Asing masuk, harga belum naik',   t:'wat'};
-  if (fn<0&&pct<0&&an<0&&bn>0)  return{l:'DISTRIBUSI',s:'Asing jual, lokal beli',           t:'bear'};
-  if (fn<0&&pct<0)               return{l:'BEARISH',   s:'Outflow asing dominan',            t:'bear'};
-  if (fn<0&&buy>Math.abs(fn)*0.8)return{l:'MIXED',     s:'Lokal absorb tekanan asing',       t:'wat'};
-  return                               {l:'SIDEWAYS',  s:'Flow relatif seimbang',             t:'neu'};
+  if (fn>0&&pct>0) return{l:'BULLISH',s:'Asing masuk + harga naik',t:'bull'};
+  if (fn>0&&pct<=0) return{l:'AKUMULASI',s:'Asing masuk, harga belum naik',t:'wat'};
+  if (fn<0&&pct<0&&an<0&&bn>0) return{l:'DISTRIBUSI',s:'Asing jual, lokal beli',t:'bear'};
+  if (fn<0&&pct<0) return{l:'BEARISH',s:'Outflow asing dominan',t:'bear'};
+  if (fn<0&&buy>Math.abs(fn)*0.8) return{l:'MIXED',s:'Lokal absorb tekanan asing',t:'wat'};
+  return {l:'SIDEWAYS',s:'Flow relatif seimbang',t:'neu'};
 }
 
 // ============================================================
-// CHARTS
+// CHARTS (existing)
 // ============================================================
 const TT={backgroundColor:'#1e232c',borderColor:'#2a3040',borderWidth:1,titleColor:'#e2e8f0',bodyColor:'#8899aa'};
 
@@ -781,10 +821,9 @@ function buildFlow(data) {
     data:{labels:s.map(b=>b.c),datasets:[{data:v,backgroundColor:c,borderColor:c.map(x=>x.replace('.8','1')),borderWidth:1,borderRadius:3}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>(ctx.parsed.x>=0?'+':'')+ctx.parsed.x.toFixed(2)+' B',title:ctx=>s[ctx[0].dataIndex].c+' — '+s[ctx[0].dataIndex].n}}},
-      scales:{x:{grid:{color:'rgba(42,48,64,.8)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10},callback:v=>(v<0?'-':'')+Math.abs(v>=1000?v/1000:v).toFixed(v>=1000?1:0)+(Math.abs(v)>=1000?'T':'B')}},
+      scales:{x:{grid:{color:'rgba(42,48,64,.8)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10},callback:fKT}},
               y:{grid:{display:false},ticks:{color:'#8899aa',font:{family:'IBM Plex Mono',size:11,weight:'500'}}}}}});
 }
-
 function buildCat(data) {
   const cats=['A','B','C'];
   const bd=cats.map(c=>+(data.filter(b=>b.cat===c&&b.net>0).reduce((s,b)=>s+b.net,0).toFixed(2)));
@@ -796,24 +835,19 @@ function buildCat(data) {
       scales:{x:{grid:{color:'rgba(42,48,64,.5)'},ticks:{color:'#8899aa',font:{family:'IBM Plex Mono',size:10}}},
               y:{grid:{color:'rgba(42,48,64,.5)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10},callback:fKT}}}}});
   $('cat-sum').innerHTML=cats.map(c=>{
-    const net=data.filter(b=>b.cat===c).reduce((s,b)=>s+b.net,0);
-    const cnt=data.filter(b=>b.cat===c).length;
+    const net=data.filter(b=>b.cat===c).reduce((s,b)=>s+b.net,0), cnt=data.filter(b=>b.cat===c).length;
     const col=net>0?'var(--green)':net<0?'var(--red)':'var(--tx2)';
     return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;font-family:'IBM Plex Mono',monospace">
       <span style="width:16px;font-weight:600;color:${c==='A'?'var(--blue)':c==='B'?'var(--green)':'var(--tx2)'}">${c}</span>
-      <span style="color:${col};font-weight:500;width:90px">${net>=0?'+':''}${fB(net)}</span>
-      <span style="color:var(--tx3)">${cnt} broker</span>
-    </div>`;
+      <span style="color:${col};font-weight:500;width:90px">${net>=0?'+':''}${fB(net)}</span><span style="color:var(--tx3)">${cnt} broker</span></div>`;
   }).join('');
 }
-
 function buildDonut(buy,sell) {
   if(CHT.d)CHT.d.destroy();
   CHT.d=new Chart($('ch-donut'),{type:'doughnut',
     data:{labels:['Net Buy','Net Sell'],datasets:[{data:[+buy.toFixed(2),+sell.toFixed(2)],backgroundColor:['rgba(0,208,132,.7)','rgba(255,77,106,.7)'],borderColor:['#00d084','#ff4d6a'],borderWidth:1,hoverOffset:6}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>ctx.label+': '+fB(ctx.parsed)}}}}});
 }
-
 function buildCbar(data) {
   const cats=['A','B','C'];
   const v=cats.map(c=>+(data.filter(b=>b.cat===c).reduce((s,b)=>s+b.net,0).toFixed(2)));
@@ -832,72 +866,263 @@ function buildLists(buyers,sellers,tbuy,tsell) {
   const tb=[...buyers].sort((a,b)=>b.net-a.net).slice(0,12);
   const ts=[...sellers].sort((a,b)=>a.net-b.net).slice(0,12);
   const mb=tb[0]?tb[0].net:1, ms=ts[0]?Math.abs(ts[0].net):1;
-  $('b-buy').textContent  = '+'+fB(tbuy);
-  $('b-sell').textContent = '-'+fB(tsell);
-  $('list-buy').innerHTML = tb.map(b=>`<div class="fi fin"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf buy" style="width:${Math.min(100,(b.net/mb*100)).toFixed(0)}%"></div></div><span class="fa buy">+${fB(b.net)}</span></div>`).join('');
-  $('list-sell').innerHTML= ts.map(b=>`<div class="fi fin"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf sell" style="width:${Math.min(100,(Math.abs(b.net)/ms*100)).toFixed(0)}%"></div></div><span class="fa sell">-${fB(Math.abs(b.net))}</span></div>`).join('');
+  $('b-buy').textContent='+'+fB(tbuy); $('b-sell').textContent='-'+fB(tsell);
+  $('list-buy').innerHTML=tb.map(b=>`<div class="fi fin"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf buy" style="width:${Math.min(100,(b.net/mb*100)).toFixed(0)}%"></div></div><span class="fa buy">+${fB(b.net)}</span></div>`).join('');
+  $('list-sell').innerHTML=ts.map(b=>`<div class="fi fin"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf sell" style="width:${Math.min(100,(Math.abs(b.net)/ms*100)).toFixed(0)}%"></div></div><span class="fa sell">-${fB(Math.abs(b.net))}</span></div>`).join('');
 }
-
-function buildTable(data) {
-  ROWS=[...data].sort((a,b)=>b.net-a.net); renderT(ROWS);
-}
+function buildTable(data) { ROWS=[...data].sort((a,b)=>b.net-a.net); renderT(ROWS); }
 function renderT(data){
   $('tbl-body').innerHTML=data.map(b=>`<tr>
     <td style="color:${b.cat==='A'?'var(--blue)':b.cat==='B'?'var(--green)':'var(--tx3)'};font-weight:600">${b.c}</td>
     <td style="color:var(--tx2)">${b.n}</td>
     <td style="color:${b.cat==='A'?'var(--blue)':b.cat==='B'?'var(--green)':'var(--tx3)'}">${b.cat}</td>
     <td class="${b.buy?'pos':'neg'}">${b.buy?'+':'-'}${fB(Math.abs(b.net))}</td>
-    <td><span class="badge ${b.buy?'buy':'sell'}">${b.buy?'BUY':'SELL'}</span></td>
-  </tr>`).join('');
+    <td><span class="badge ${b.buy?'buy':'sell'}">${b.buy?'BUY':'SELL'}</span></td></tr>`).join('');
 }
-function filterT(q){
-  if(!q){renderT(ROWS);return;}
-  const ql=q.toLowerCase();
-  renderT(ROWS.filter(b=>b.c.toLowerCase().includes(ql)||b.n.toLowerCase().includes(ql)));
-}
+function filterT(q){ if(!q){renderT(ROWS);return;} const ql=q.toLowerCase(); renderT(ROWS.filter(b=>b.c.toLowerCase().includes(ql)||b.n.toLowerCase().includes(ql))); }
 
 // ============================================================
 // SIGNALS TEXT
 // ============================================================
 function buildSigs(fn,pct,data,sig) {
-  const an=data.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
-  const bn=data.filter(b=>b.cat==='B').reduce((s,b)=>s+b.net,0);
-  const ts=[...data].sort((a,b)=>a.net-b.net)[0];
-  const tb=[...data].sort((a,b)=>b.net-a.net)[0];
+  const an=data.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0), bn=data.filter(b=>b.cat==='B').reduce((s,b)=>s+b.net,0);
+  const ts=[...data].sort((a,b)=>a.net-b.net)[0], tb=[...data].sort((a,b)=>b.net-a.net)[0];
   let h=`<div class="sig ${sig.t}"><div class="sl">${sig.l}</div><div class="st">FNVal: ${fn>=0?'+':''}${fB(fn)} | Harga: ${pct?(pct>=0?'+':'')+pct.toFixed(1)+'%':'—'}</div></div>`;
-  if(an<0&&bn>0) h+=`<div class="sig bear"><div class="sl">Pola distribusi terdeteksi</div><div class="st">Kat. A (asing institusional) net sell <strong>${fB(Math.abs(an))}</strong>, sementara Kat. B (lokal/hybrid) net buy <strong>${fB(bn)}</strong>. Ini pola klasik distribusi — tangan kuat melepas ke tangan lemah. Harga biasanya masih tertekan.</div></div>`;
-  else if(an>0&&bn>0) h+=`<div class="sig bull"><div class="sl">Konfluensi beli kuat</div><div class="st">Asing (Kat. A) dan lokal (Kat. B) sama-sama net buy. Kemungkinan inflow nyata atau awal siklus akumulasi.</div></div>`;
-  if(ts&&ts.net<0) h+=`<div class="sig neu"><div class="sl">Penjual dominan — ${ts.c}</div><div class="st">${ts.c} (${ts.n}) net sell <strong>${fB(Math.abs(ts.net))}</strong>. Pantau perubahan posisi broker ini setiap periode untuk sinyal supply selesai.</div></div>`;
-  if(tb&&tb.net>0) h+=`<div class="sig neu"><div class="sl">Pembeli dominan — ${tb.c}</div><div class="st">${tb.c} (${tb.n}) net buy <strong>+${fB(tb.net)}</strong>. Konsistensi akumulasi ini bisa jadi indikator kepercayaan terhadap saham.</div></div>`;
+  if(an<0&&bn>0) h+=`<div class="sig bear"><div class="sl">Pola distribusi terdeteksi</div><div class="st">Kat. A (asing) net sell <strong>${fB(Math.abs(an))}</strong>, Kat. B (lokal) net buy <strong>${fB(bn)}</strong>. Tangan kuat melepas ke tangan lemah.</div></div>`;
+  else if(an>0&&bn>0) h+=`<div class="sig bull"><div class="sl">Konfluensi beli kuat</div><div class="st">Asing dan lokal sama-sama net buy.</div></div>`;
+  if(ts&&ts.net<0) h+=`<div class="sig neu"><div class="sl">Penjual dominan — ${ts.c}</div><div class="st">${ts.c} (${ts.n}) net sell <strong>${fB(Math.abs(ts.net))}</strong>.</div></div>`;
+  if(tb&&tb.net>0) h+=`<div class="sig neu"><div class="sl">Pembeli dominan — ${tb.c}</div><div class="st">${tb.c} (${tb.n}) net buy <strong>+${fB(tb.net)}</strong>.</div></div>`;
   $('sig-area').innerHTML=h;
+}
+
+// ============================================================
+// BANDARMOLOGY CONCENTRATION
+// ============================================================
+function buildBandar(data) {
+  const buyers=[...data.filter(b=>b.net>0)].sort((a,b)=>b.net-a.net);
+  const totalBuy=buyers.reduce((s,b)=>s+b.net,0);
+  const top3=buyers.slice(0,3), top3Sum=top3.reduce((s,b)=>s+b.net,0);
+  const pct = totalBuy?(top3Sum/totalBuy*100):0;
+  const col = pct>=60?'var(--red)':pct>=40?'var(--amber)':'var(--green)';
+  const fill=$('bandar-fill');
+  fill.style.width=Math.min(100,pct).toFixed(1)+'%';
+  fill.style.background=col;
+  fill.textContent=pct.toFixed(1)+'%';
+  fill.style.color = pct>15 ? '#000' : 'var(--tx)';
+  $('bandar-detail').innerHTML = `<div style="margin-top:10px">` + top3.map(b=>`
+    <div class="fi"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><span class="fa buy">+${fB(b.net)}</span></div>
+  `).join('') + `<div style="font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:8px">Top 3 broker buy = ${fB(top3Sum)} dari total buy ${fB(totalBuy)}.${pct>=60?' <span style="color:var(--red)">⚠ Konsentrasi tinggi — indikasi akumulasi terorganisir.</span>':''}</div></div>`;
+  return { pct, top3, totalBuy };
+}
+
+// ============================================================
+// ATV / HNWI DETECTOR
+// ============================================================
+function buildATV(data, threshold) {
+  const withFreq = data.filter(b=>b.freq>0).map(b=>({...b, atv:(b.nb+b.ns)/b.freq}));
+  const flagged = withFreq.filter(b=>b.atv>=threshold).sort((a,b)=>b.atv-a.atv);
+  $('atv-count').textContent = flagged.length+' flagged';
+  if (!withFreq.length) {
+    $('atv-list').innerHTML = `<div class="snap-empty">Belum ada data frekuensi. Isi tab "Paste TSV" bagian Data Frekuensi atau kolom Freq di Manual Entry untuk mengaktifkan ATV Detector.</div>`;
+    return [];
+  }
+  const maxAtv = Math.max(...withFreq.map(b=>b.atv), 0.01);
+  $('atv-list').innerHTML = withFreq.sort((a,b)=>b.atv-a.atv).slice(0,15).map(b=>{
+    const isFlag = b.atv>=threshold;
+    return `<div class="fi fin">
+      <span class="fc ${b.cat}">${b.c}</span>
+      <span class="fn">${b.n}${isFlag&&b.cat!=='A'?' <span class="badge warn" style="margin-left:4px">HNWI?</span>':''}</span>
+      <div class="fbt"><div class="fbf atv" style="width:${Math.min(100,(b.atv/maxAtv*100)).toFixed(0)}%"></div></div>
+      <span class="fa atv">${fB(b.atv)}/tx</span>
+    </div>`;
+  }).join('');
+  return flagged;
+}
+
+// ============================================================
+// VPA QUADRANT
+// ============================================================
+function buildVPA(data) {
+  const counts = {markup:0,exh:0,abs:0,mkd:0};
+  data.forEach(d=>counts[d.cls]++);
+  $('qc-markup').textContent=counts.markup; $('qc-exh').textContent=counts.exh;
+  $('qc-abs').textContent=counts.abs; $('qc-mkd').textContent=counts.mkd;
+
+  const latest = data[data.length-1];
+  const latestBox = latest ? `<div class="sig ${latest.cls==='markup'?'bull':latest.cls==='mkd'?'bear':latest.cls==='exh'?'wat':'neu'}" style="margin-top:12px">
+    <div class="sl">Hari terakhir (${latest.date}): ${VPA_LABEL[latest.cls]}</div>
+    <div class="st">ΔPrice ${latest.pctP>=0?'+':''}${latest.pctP.toFixed(1)}% | ΔVolume ${latest.pctV>=0?'+':''}${latest.pctV.toFixed(1)}%. ${
+      latest.cls==='exh' ? 'Harga naik tapi volume mengecil — waspada Bull Trap, market maker bisa menarik likuiditas.' :
+      latest.cls==='abs' ? 'Harga turun tapi volume kering — kemungkinan healthy retracement, institusi sedang menadah barang.' :
+      latest.cls==='mkd' ? 'Harga turun dengan volume tinggi — indikasi distribusi/markdown nyata.' :
+      'Harga naik dengan volume naik — markup yang valid, partisipasi pasar mengonfirmasi tren.'
+    }</div></div>` : '';
+  $('vpa-latest').innerHTML = latestBox;
+
+  if (CHT.vpa) CHT.vpa.destroy();
+  CHT.vpa = new Chart($('ch-vpa'), {
+    type:'scatter',
+    data:{ datasets:[{
+      data: data.map(d=>({x:+d.pctV.toFixed(1), y:+d.pctP.toFixed(1), label:d.date, cls:d.cls})),
+      backgroundColor: data.map(d=>VPA_COLOR[d.cls]),
+      pointRadius:7, pointHoverRadius:9,
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{
+        title:ctx=>ctx[0].raw.label,
+        label:ctx=>[VPA_LABEL[ctx.raw.cls],'ΔPrice: '+ctx.raw.y+'% | ΔVol: '+ctx.raw.x+'%']
+      }}},
+      scales:{
+        x:{title:{display:true,text:'Δ Volume (%)',color:'#8899aa',font:{family:'IBM Plex Mono',size:10}},grid:{color:'rgba(42,48,64,.6)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10}}},
+        y:{title:{display:true,text:'Δ Price (%)',color:'#8899aa',font:{family:'IBM Plex Mono',size:10}},grid:{color:'rgba(42,48,64,.6)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10}}}
+      }}
+  });
+
+  $('vpa-table').innerHTML = `<table class="dt"><thead><tr><th style="text-align:left">Tanggal</th><th>ΔPrice</th><th>ΔVol</th><th style="text-align:left">Klasifikasi</th></tr></thead><tbody>`+
+    data.map(d=>`<tr><td>${d.date}</td><td class="${d.pctP>=0?'pos':'neg'}">${d.pctP>=0?'+':''}${d.pctP.toFixed(1)}%</td><td class="${d.pctV>=0?'pos':'neg'}">${d.pctV>=0?'+':''}${d.pctV.toFixed(1)}%</td><td><span class="badge" style="background:${VPA_COLOR[d.cls]}22;color:${VPA_COLOR[d.cls]}">${VPA_LABEL[d.cls]}</span></td></tr>`).join('')+
+    `</tbody></table>`;
+
+  return latest;
+}
+
+// ============================================================
+// SNAPSHOT MANAGER
+// ============================================================
+function saveSnapshot() {
+  if (!BD.length) { alert('Belum ada data untuk disimpan. Jalankan analisis dulu.'); return; }
+  const label = $('snap-label').value.trim() || ('Snapshot '+(SNAPSHOTS.length+1));
+  SNAPSHOTS.push({ id:Date.now(), label, ts:new Date().toLocaleString('id'), data:JSON.parse(JSON.stringify(BD)) });
+  $('snap-label').value='';
+  renderSnapshotList(); renderCompareSelects();
+}
+function deleteSnapshot(id) { SNAPSHOTS = SNAPSHOTS.filter(s=>s.id!==id); renderSnapshotList(); renderCompareSelects(); }
+function renderSnapshotList() {
+  const el = $('snap-list');
+  if (!SNAPSHOTS.length) { el.innerHTML=''; el.className='snap-empty'; el.textContent='Belum ada snapshot tersimpan.'; return; }
+  el.className=''; el.innerHTML = SNAPSHOTS.map(s=>`<span class="snap-chip">${s.label} <span class="ts">${s.ts}</span>
+    <span class="x" onclick="exportSnapshot(${s.id})" title="Export">⬇</span>
+    <span class="x" onclick="deleteSnapshot(${s.id})" title="Hapus">✕</span></span>`).join('');
+}
+function renderCompareSelects() {
+  ['snap-before','snap-after'].forEach(id=>{
+    const sel = $(id); const cur = sel.value;
+    sel.innerHTML = '<option value="">— pilih —</option>' + SNAPSHOTS.map(s=>`<option value="${s.id}">${s.label} (${s.ts})</option>`).join('');
+    sel.value = cur;
+  });
+}
+function exportSnapshot(id) {
+  const s = SNAPSHOTS.find(x=>x.id===id); if (!s) return;
+  downloadJSON([s], 'snapshot_'+s.label.replace(/\s+/g,'_')+'.json');
+}
+function exportAllSnapshots() {
+  if (!SNAPSHOTS.length) { alert('Tidak ada snapshot untuk di-export.'); return; }
+  downloadJSON(SNAPSHOTS, 'broker_snapshots_'+new Date().toISOString().slice(0,10)+'.json');
+}
+function downloadJSON(obj, filename) {
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importSnapshotFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const arr = Array.isArray(parsed) ? parsed : [parsed];
+      arr.forEach(s => { if (s.label && s.data) SNAPSHOTS.push({...s, id: s.id || Date.now()+Math.random()}); });
+      renderSnapshotList(); renderCompareSelects();
+      alert(arr.length+' snapshot berhasil di-import.');
+    } catch(err) { alert('Gagal membaca file JSON: '+err.message); }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+function compareSnapshots() {
+  const id1 = $('snap-before').value, id2 = $('snap-after').value;
+  if (!id1 || !id2) { alert('Pilih kedua snapshot (Before & After) dulu.'); return; }
+  const s1 = SNAPSHOTS.find(s=>s.id==id1), s2 = SNAPSHOTS.find(s=>s.id==id2);
+  if (!s1 || !s2) return;
+  const whitelist = ($('m-whitelist').value||'').toUpperCase().split(',').map(s=>s.trim()).filter(Boolean);
+
+  const codes = new Set([...s1.data.map(b=>b.c), ...s2.data.map(b=>b.c)]);
+  const rows = [...codes].map(c => {
+    const b1 = s1.data.find(b=>b.c===c), b2 = s2.data.find(b=>b.c===c);
+    const net1 = b1?b1.net:0, net2 = b2?b2.net:0;
+    const cat = (b2||b1)?.cat || 'B';
+    const name = (b2||b1)?.n || c;
+    return { c, n:name, cat, net1, net2, delta: net2-net1, isWl: whitelist.includes(c) };
+  }).sort((a,b)=>b.delta-a.delta);
+
+  const top = rows.slice(0,20);
+  $('compare-result').innerHTML = `
+    <div style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin:12px 0 8px">
+      ${s1.label} → ${s2.label} — diurutkan berdasarkan akselerasi net buy (delta terbesar)
+    </div>
+    <div class="sy" style="max-height:320px">
+    <table class="dt"><thead><tr><th style="text-align:left">Kode</th><th style="text-align:left">Nama</th><th>Net ${s1.label}</th><th>Net ${s2.label}</th><th>Δ Delta</th></tr></thead><tbody>
+    ${top.map(r=>`<tr style="${r.isWl?'background:rgba(167,139,250,0.06)':''}">
+      <td style="font-weight:600">${r.c}${r.isWl?' <span class="badge pur">WL</span>':''}</td>
+      <td style="color:var(--tx2)">${r.n}</td>
+      <td class="${r.net1>=0?'pos':'neg'}">${(r.net1>=0?'+':'')+fB(r.net1)}</td>
+      <td class="${r.net2>=0?'pos':'neg'}">${(r.net2>=0?'+':'')+fB(r.net2)}</td>
+      <td class="${r.delta>=0?'pos':'neg'}" style="font-weight:600">${(r.delta>=0?'+':'')+fB(r.delta)}</td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+// ============================================================
+// CONFLUENCE SIGNAL
+// ============================================================
+function buildConfluence(bandar, atvFlags, vpaLatest, whitelist, data) {
+  document.getElementById('confluence-panel').style.display='block';
+  const cond1 = bandar.pct >= 60;
+  const flaggedBuyers = atvFlags.filter(b=>b.net>0);
+  const cond2 = flaggedBuyers.length > 0;
+  const cond3 = vpaLatest ? vpaLatest.cls==='markup' : null; // null = no data
+
+  const wlBuyers = whitelist.length ? data.filter(b=>whitelist.includes(b.c) && b.net>0) : [];
+  const cond4 = whitelist.length ? wlBuyers.length>0 : null;
+
+  const conds = [
+    { ok:cond1, label:'Bandarmology Index ≥60%', detail: bandar.pct.toFixed(1)+'% top-3 buy concentration' },
+    { ok:cond2, label:'ATV Detector: HNWI buyer terdeteksi', detail: flaggedBuyers.length+' broker flagged sebagai net buyer' },
+    { ok:cond3, label:'VPA hari terakhir = Markup (Valid)', detail: vpaLatest?VPA_LABEL[vpaLatest.cls]:'Data VPA belum diisi' },
+  ];
+  if (whitelist.length) conds.push({ ok:cond4, label:'Whitelist broker net buy', detail: wlBuyers.map(b=>b.c).join(', ')||'Tidak ada whitelist yang net buy' });
+
+  const metCount = conds.filter(c=>c.ok===true).length;
+  const totalActive = conds.filter(c=>c.ok!==null).length;
+  const verdict = metCount===totalActive && totalActive>0 ? 'bull' : metCount>0 ? 'wat' : 'neu';
+  const verdictLabel = metCount===totalActive && totalActive>0 ? 'KONFLUENSI TERPENUHI' : metCount>0 ? 'KONFLUENSI SEBAGIAN' : 'BELUM ADA KONFLUENSI';
+
+  $('confluence-body').innerHTML = `
+    <div class="sig ${verdict}"><div class="sl">${verdictLabel}</div><div class="st">${metCount}/${totalActive} kondisi terpenuhi. Confluence Scoring ini meniru Step 3 blueprint — sinyal entry idealnya HANYA dipertimbangkan ketika semua variabel berpotongan.</div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px">
+    ${conds.map(c=>`<div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:6px;padding:10px 12px">
+      <div style="font-size:16px">${c.ok===true?'✅':c.ok===false?'❌':'➖'}</div>
+      <div style="font-size:11px;color:var(--tx);font-weight:500;margin-top:4px">${c.label}</div>
+      <div style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:3px">${c.detail}</div>
+    </div>`).join('')}
+    </div>`;
 }
 
 // ============================================================
 // HELPERS
 // ============================================================
-function $(id){return document.getElementById(id);}
-function set(id,v){$(id).textContent=v;}
-function fB(v){
-  const a=Math.abs(v);
-  if(a>=1000) return (a/1000).toFixed(2)+' T';
-  if(a>=1)    return a.toFixed(2)+' B';
-  if(a>=0.001)return (a*1000).toFixed(1)+' M';
-  return (a*1e6).toFixed(0)+' jt';
-}
-function fN(v){return v?v.toLocaleString('id'):'—';}
-function fPt(v){return (v>=0?'+':'')+v.toLocaleString('id');}
-function fKT(v){
-  const a=Math.abs(v);
-  if(a>=1000) return (v<0?'-':'')+Math.abs(v/1000).toFixed(1)+'T';
-  return (v<0?'-':'')+Math.abs(v).toFixed(0)+'B';
-}
+function $(id){ return document.getElementById(id); }
+function set(id,v){ $(id).textContent=v; }
+function fB(v){ const a=Math.abs(v); if(a>=1000) return (a/1000).toFixed(2)+' T'; if(a>=1) return a.toFixed(2)+' B'; if(a>=0.001) return (a*1000).toFixed(1)+' M'; return (a*1e6).toFixed(0)+' jt'; }
+function fN(v){ return v?v.toLocaleString('id'):'—'; }
+function fPt(v){ return (v>=0?'+':'')+v.toLocaleString('id'); }
+function fKT(v){ const a=Math.abs(v); if(a>=1000) return (v<0?'-':'')+Math.abs(v/1000).toFixed(1)+'T'; return (v<0?'-':'')+Math.abs(v).toFixed(0)+'B'; }
 
 // ============================================================
 // INIT
 // ============================================================
-window.onload = function() {
-  clearManual();
-};
+window.onload = function() { clearManual(); };
 </script>
 </body>
 </html>
