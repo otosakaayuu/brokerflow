@@ -2,1127 +2,1008 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Broker Flow Analyzer v2.0 — IDX</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BFA v3 — Sovereign Alpha</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{--bg:#0a0c0f;--bg2:#111318;--bg3:#181c23;--bg4:#1e232c;--bdr:#2a3040;--bdr2:#3a4455;--tx:#e2e8f0;--tx2:#8899aa;--tx3:#556070;--green:#00d084;--green2:#00a866;--gbg:rgba(0,208,132,0.08);--red:#ff4d6a;--red2:#cc2244;--rbg:rgba(255,77,106,0.08);--blue:#4da6ff;--bbg:rgba(77,166,255,0.08);--amber:#ffb84d;--ambg:rgba(255,184,77,0.08);--purple:#a78bfa;--pbg:rgba(167,139,250,0.08);--acc:#00d084}
+:root{--bg:#07090d;--bg2:#0d1117;--bg3:#161b22;--bg4:#1c2230;--bg5:#212838;--bdr:#21283a;--bdr2:#2d3748;--tx:#e6edf3;--tx2:#8b949e;--tx3:#484f58;--g:#2ea043;--g2:#3fb950;--gl:rgba(46,160,67,.12);--r:#da3633;--r2:#f85149;--rl:rgba(218,54,51,.12);--b:#1f6feb;--b2:#388bfd;--bl:rgba(31,111,235,.12);--am:#d29922;--am2:#e3b341;--aml:rgba(210,153,34,.12);--pu:#6e40c9;--pu2:#a371f7;--pul:rgba(110,64,201,.12);--te:#1f7a8c;--te2:#39c5cf;--tel:rgba(31,122,140,.12);--acc:#2ea043;--acc2:#3fb950;--hl:#f0883e}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;font-size:13px;min-height:100vh}
-.hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px}
-.hdr-l{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.logo{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:var(--acc);letter-spacing:.05em}
-.logo span{color:var(--tx2);font-weight:400}
-.tbadge{background:var(--bg4);border:1px solid var(--bdr2);padding:4px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;display:flex;align-items:center;gap:8px}
-.tbadge .pr{color:var(--green);font-weight:600}
-.hst{font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace}
-.main{padding:18px 24px;max-width:1440px;margin:0 auto}
-.isec{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:18px 22px;margin-bottom:18px}
-.isec-t{font-size:11px;font-weight:600;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;font-family:'IBM Plex Mono',monospace}
-.tabs{display:flex;border-bottom:1px solid var(--bdr);margin-bottom:16px;flex-wrap:wrap}
-.tab{padding:9px 14px;font-size:11px;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;user-select:none}
-.tab:hover{color:var(--tx2)}.tab.on{color:var(--acc);border-bottom-color:var(--acc)}
-.paste-area{width:100%;background:var(--bg3);border:1px solid var(--bdr);color:var(--tx2);padding:10px 12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;resize:vertical;outline:none;min-height:130px;line-height:1.65;transition:border-color .15s}
-.paste-area:focus{border-color:var(--acc)}
-.paste-area.sm{min-height:70px}
-.scale-row{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;font-size:11px;font-family:'IBM Plex Mono',monospace}
-.scale-row label{display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--tx2)}
-.scale-row input[type=radio]{accent-color:var(--acc)}
-.scale-hint{color:var(--amber);font-size:10px}
-.mt{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11px}
-.mt th{background:var(--bg3);color:var(--tx3);padding:6px 8px;text-align:left;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bdr);white-space:nowrap}
-.mt td{padding:3px 5px;border-bottom:1px solid var(--bdr)}
-.mt tr:hover td{background:rgba(255,255,255,.02)}
-.mt input{background:transparent;border:none;color:var(--tx);font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;padding:4px 5px;outline:none;border-radius:3px}
-.mt input:focus{background:var(--bg4)}
-.mt input.ci{color:var(--blue);font-weight:600;text-transform:uppercase}
-.mt input.nb{color:var(--green)}.mt input.ns{color:var(--red)}.mt input.fq{color:var(--purple)}
-.cat-sel{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:4px 6px;border-radius:3px;font-size:10px;font-family:'IBM Plex Mono',monospace;outline:none;width:100%}
-.del-btn{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:13px;padding:2px 6px}
-.del-btn:hover{color:var(--red)}
-.alert{padding:9px 13px;border-radius:4px;font-size:11px;margin-bottom:10px;font-family:'IBM Plex Mono',monospace;line-height:1.65}
-.a-info{background:var(--bbg);color:var(--blue);border:1px solid rgba(77,166,255,.3)}
-.a-ok{background:var(--gbg);color:var(--green);border:1px solid rgba(0,208,132,.3)}
-.a-warn{background:var(--ambg);color:var(--amber);border:1px solid rgba(255,184,77,.3)}
-.a-pur{background:var(--pbg);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
-.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
-.ig{display:flex;flex-direction:column;gap:4px}
-.ig label{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono',monospace}
-.ig input{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:7px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;transition:border-color .15s}
-.ig input:focus{border-color:var(--acc)}
-.ig input.s{border-left:2px solid var(--red)}
-.br{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
-.btn{padding:8px 20px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s;letter-spacing:.03em}
-.bp{background:var(--acc);color:#000}.bp:hover{background:var(--green2)}
-.bs{background:var(--bg4);color:var(--tx2);border:1px solid var(--bdr2)}.bs:hover{border-color:var(--tx2);color:var(--tx)}
-.bpu{background:var(--purple);color:#1a1530}.bpu:hover{opacity:.85}
-.bsm{padding:4px 10px;font-size:10px}
-.divider{height:1px;background:var(--bdr);margin:12px 0}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:18px}
-.kpi{background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;padding:13px 15px;position:relative;overflow:hidden}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.kpi.g::before{background:var(--green)}.kpi.r::before{background:var(--red)}.kpi.b::before{background:var(--blue)}.kpi.a::before{background:var(--amber)}.kpi.p::before{background:var(--purple)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;font-size:13px;line-height:1.5;min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+
+/* === HEADER === */
+.hdr{background:rgba(13,17,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);padding:0 20px;position:sticky;top:0;z-index:200;display:flex;align-items:center;height:48px;gap:16px;flex-wrap:wrap}
+.logo{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:var(--acc2);letter-spacing:.06em;flex-shrink:0}
+.logo span{color:var(--tx3);font-weight:400}
+.hchip{background:var(--bg3);border:1px solid var(--bdr2);padding:3px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.hprice{color:var(--acc2);font-weight:600;font-size:13px}
+.hst{font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-left:auto;white-space:nowrap}
+.hpulse{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 0 rgba(46,160,67,.4);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,160,67,.4)}70%{box-shadow:0 0 0 6px rgba(46,160,67,0)}100%{box-shadow:0 0 0 0 rgba(46,160,67,0)}}
+
+/* === SIDENAV === */
+.layout{display:flex;min-height:calc(100vh - 48px)}
+.sidenav{width:200px;background:var(--bg2);border-right:1px solid var(--bdr);padding:12px 0;flex-shrink:0;position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto}
+.snav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:12px;color:var(--tx2);cursor:pointer;border-left:2px solid transparent;transition:all .15s;font-family:'IBM Plex Mono',monospace}
+.snav-item:hover{color:var(--tx);background:var(--bg3)}
+.snav-item.on{color:var(--acc2);border-left-color:var(--acc);background:var(--gl)}
+.snav-sep{height:1px;background:var(--bdr);margin:8px 12px}
+.snav-lbl{font-size:9px;color:var(--tx3);padding:8px 16px 4px;letter-spacing:.1em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.snav-dot{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0}
+.snav-item.on .snav-dot{background:var(--acc2)}
+
+/* === MAIN === */
+.main{flex:1;padding:20px;overflow-x:hidden;max-width:calc(100vw - 200px)}
+.section{display:none;animation:fade .2s ease}
+.section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* === CARDS === */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.card-h{padding:10px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-t{font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.12em;font-family:'IBM Plex Mono',monospace}
+.card-b{padding:14px 16px}
+
+/* === KPI GRID === */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;padding:12px 14px;position:relative;overflow:hidden;transition:border-color .2s}
+.kpi:hover{border-color:var(--bdr2)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.kpi.g::before{background:linear-gradient(90deg,var(--g),var(--g2))}
+.kpi.r::before{background:linear-gradient(90deg,var(--r),var(--r2))}
+.kpi.b::before{background:linear-gradient(90deg,var(--b),var(--b2))}
+.kpi.am::before{background:linear-gradient(90deg,var(--am),var(--am2))}
+.kpi.pu::before{background:linear-gradient(90deg,var(--pu),var(--pu2))}
+.kpi.te::before{background:linear-gradient(90deg,var(--te),var(--te2))}
 .kl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono',monospace;margin-bottom:5px}
-.kv{font-size:21px;font-weight:600;font-family:'IBM Plex Mono',monospace;line-height:1}
-.kv.g{color:var(--green)}.kv.r{color:var(--red)}.kv.b{color:var(--blue)}.kv.a{color:var(--amber)}.kv.p{color:var(--purple)}
+.kv{font-size:20px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.kv.g{color:var(--g2)}.kv.r{color:var(--r2)}.kv.b{color:var(--b2)}.kv.am{color:var(--am2)}.kv.pu{color:var(--pu2)}.kv.te{color:var(--te2)}
 .ks{font-size:10px;color:var(--tx3);margin-top:4px;font-family:'IBM Plex Mono',monospace}
-.dash{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
-@media(max-width:900px){.dash{grid-template-columns:1fr}}
-.panel{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
-.panel.full{margin-bottom:18px}
-.ph{padding:11px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
-.pt{font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.12em;font-family:'IBM Plex Mono',monospace}
-.pb{padding:14px}
-.fi{display:flex;align-items:center;gap:7px;margin-bottom:7px}
-.fc{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;width:32px;padding:2px 4px;border-radius:3px;text-align:center;flex-shrink:0}
-.fc.A{background:rgba(77,166,255,.15);color:var(--blue)}.fc.B{background:rgba(0,208,132,.12);color:var(--green)}.fc.C{background:rgba(136,153,170,.12);color:var(--tx2)}
-.fn{flex:1;color:var(--tx2);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fbt{width:100px;height:11px;background:var(--bg3);border-radius:2px;overflow:hidden;flex-shrink:0}
-.fbf{height:100%;border-radius:2px;transition:width .4s ease}
-.fbf.buy{background:var(--green)}.fbf.sell{background:var(--red)}.fbf.atv{background:var(--purple)}
-.fa{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;width:80px;text-align:right;flex-shrink:0}
-.fa.buy{color:var(--green)}.fa.sell{color:var(--red)}.fa.atv{color:var(--purple)}
-.sig{border-radius:6px;padding:13px 15px;border:1px solid;margin-bottom:10px}
-.sig.bull{background:var(--gbg);border-color:var(--green2)}
-.sig.bear{background:var(--rbg);border-color:var(--red2)}
-.sig.neu{background:var(--bg3);border-color:var(--bdr2)}
-.sig.wat{background:var(--ambg);border-color:#cc8800}
-.sig.pur{background:var(--pbg);border-color:#7c5fd9}
-.sl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-family:'IBM Plex Mono',monospace;margin-bottom:4px}
-.sig.bull .sl{color:var(--green)}.sig.bear .sl{color:var(--red)}.sig.neu .sl{color:var(--tx2)}.sig.wat .sl{color:var(--amber)}.sig.pur .sl{color:var(--purple)}
-.st{font-size:12px;color:var(--tx2);line-height:1.6}
-.dt{width:100%;border-collapse:collapse;font-size:11px}
-.dt th{background:var(--bg3);color:var(--tx3);padding:6px 9px;text-align:right;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bdr);font-family:'IBM Plex Mono',monospace}
+
+/* === INPUT === */
+.tabs{display:flex;border-bottom:1px solid var(--bdr);margin-bottom:14px;gap:0;overflow-x:auto}
+.tab{padding:8px 14px;font-size:10px;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;transition:all .15s}
+.tab:hover{color:var(--tx2)}.tab.on{color:var(--acc2);border-bottom-color:var(--acc)}
+textarea{width:100%;background:var(--bg3);border:1px solid var(--bdr);color:var(--tx2);padding:10px 12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;resize:vertical;outline:none;line-height:1.7;transition:border-color .15s;min-height:110px}
+textarea:focus{border-color:var(--acc)}
+textarea.sm{min-height:65px}
+.irow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+.ig label{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace}
+.ig input,.ig select{width:100%;background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:7px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;transition:border-color .15s}
+.ig input:focus,.ig select:focus{border-color:var(--acc)}
+.alert{padding:9px 13px;border-radius:4px;font-size:11px;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;line-height:1.7}
+.ai{background:var(--bl);color:var(--b2);border:1px solid rgba(56,139,253,.25)}
+.ao{background:var(--gl);color:var(--g2);border:1px solid rgba(63,185,80,.25)}
+.aw{background:var(--aml);color:var(--am2);border:1px solid rgba(227,179,65,.25)}
+.ap{background:var(--pul);color:var(--pu2);border:1px solid rgba(163,113,247,.25)}
+.btn{padding:8px 18px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s;letter-spacing:.03em}
+.bp{background:var(--acc);color:#000}.bp:hover{background:var(--acc2);transform:translateY(-1px)}
+.bs{background:var(--bg4);color:var(--tx2);border:1px solid var(--bdr2)}.bs:hover{border-color:var(--b2);color:var(--b2)}
+.bpu{background:var(--pu);color:#e0d8ff}.bpu:hover{background:var(--pu2);color:#fff}
+.br{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.divider{height:1px;background:var(--bdr);margin:12px 0}
+
+/* === TABLE === */
+.dt{width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',monospace}
+.dt th{background:var(--bg3);color:var(--tx3);padding:6px 9px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bdr);white-space:nowrap;position:sticky;top:0}
 .dt th:first-child,.dt th:nth-child(2){text-align:left}
-.dt td{padding:5px 9px;border-bottom:1px solid var(--bdr);text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--tx2)}
-.dt td:first-child{text-align:left}.dt td:nth-child(2){text-align:left;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dt tr:hover td{background:rgba(255,255,255,.02)}
-.dt .pos{color:var(--green)}.dt .neg{color:var(--red)}
-.prev-t{width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',monospace}
-.prev-t th{background:var(--bg3);color:var(--tx3);padding:5px 8px;text-align:left;border-bottom:1px solid var(--bdr);font-size:10px;text-transform:uppercase;position:sticky;top:0}
-.prev-t td{padding:4px 8px;border-bottom:1px solid var(--bdr);color:var(--tx2)}
-.prev-t .pos{color:var(--green)}.prev-t .neg{color:var(--red)}
-.badge{font-size:10px;padding:2px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:500}
-.badge.buy{background:var(--gbg);color:var(--green)}.badge.sell{background:var(--rbg);color:var(--red)}.badge.warn{background:var(--ambg);color:var(--amber)}.badge.pur{background:var(--pbg);color:var(--purple)}
-.sy{overflow-y:auto;max-height:340px}
-.sy::-webkit-scrollbar{width:4px}
-.sy::-webkit-scrollbar-track{background:var(--bg2)}
-.sy::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
-.hidden{display:none!important}
-@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.fin{animation:fi .25s ease forwards}
-.footer{text-align:center;padding:18px;color:var(--tx3);font-size:10px;font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--bdr);margin-top:24px;line-height:1.8}
-/* GAUGE */
-.gauge-wrap{margin-bottom:14px}
-.gauge-track{width:100%;height:28px;background:var(--bg3);border-radius:6px;overflow:hidden;display:flex;position:relative;border:1px solid var(--bdr)}
-.gauge-fill{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;transition:width .5s ease;color:#000}
-.gauge-thresh{position:absolute;top:0;bottom:0;width:2px;background:var(--amber)}
-.gauge-label-row{display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:5px}
-/* SNAPSHOT */
+.dt td{padding:5px 9px;border-bottom:1px solid var(--bdr);color:var(--tx2);text-align:right}
+.dt td:first-child{text-align:left}.dt td:nth-child(2){text-align:left;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dt tr:hover td{background:rgba(255,255,255,.025)}
+.pos{color:var(--g2)}.neg{color:var(--r2)}
+.sy{overflow-y:auto;max-height:380px}
+
+/* === BROKER FLOW BARS === */
+.fi{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fc{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;width:28px;padding:2px 3px;border-radius:3px;text-align:center;flex-shrink:0}
+.fc.A{background:rgba(31,111,235,.2);color:var(--b2)}.fc.B{background:rgba(46,160,67,.15);color:var(--g2)}.fc.C{background:rgba(72,79,88,.2);color:var(--tx2)}
+.fn{flex:1;color:var(--tx2);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fbt{width:90px;height:9px;background:var(--bg3);border-radius:2px;overflow:hidden;flex-shrink:0}
+.fbf{height:100%;border-radius:2px;transition:width .4s}
+.fbf.buy{background:var(--g2)}.fbf.sell{background:var(--r2)}.fbf.atv{background:var(--pu2)}
+.fa{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;width:80px;text-align:right;flex-shrink:0}
+.fa.buy{color:var(--g2)}.fa.sell{color:var(--r2)}.fa.atv{color:var(--pu2)}
+
+/* === SIGNAL BOXES === */
+.sig{border-radius:6px;padding:12px 14px;border:1px solid;margin-bottom:10px}
+.sig.bull{background:var(--gl);border-color:rgba(46,160,67,.4)}
+.sig.bear{background:var(--rl);border-color:rgba(218,54,51,.4)}
+.sig.neu{background:var(--bg3);border-color:var(--bdr2)}
+.sig.wat{background:var(--aml);border-color:rgba(210,153,34,.4)}
+.sig.pu{background:var(--pul);border-color:rgba(110,64,201,.4)}
+.sig.te{background:var(--tel);border-color:rgba(31,122,140,.4)}
+.sl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-family:'IBM Plex Mono',monospace;margin-bottom:5px}
+.sig.bull .sl{color:var(--g2)}.sig.bear .sl{color:var(--r2)}.sig.neu .sl{color:var(--tx2)}.sig.wat .sl{color:var(--am2)}.sig.pu .sl{color:var(--pu2)}.sig.te .sl{color:var(--te2)}
+.st{font-size:12px;color:var(--tx2);line-height:1.7}
+
+/* === GAUGE === */
+.gauge-wrap{margin-bottom:12px}
+.gauge-track{height:30px;background:var(--bg3);border-radius:6px;overflow:hidden;display:flex;position:relative;border:1px solid var(--bdr)}
+.gauge-fill{height:100%;display:flex;align-items:center;padding-right:10px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;transition:width .6s ease;justify-content:flex-end}
+.gauge-thresh{position:absolute;top:0;bottom:0;width:2px;background:var(--am2);opacity:.7}
+.gauge-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:5px}
+
+/* === QUADRANT === */
+.quad-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.qc{border-radius:6px;padding:10px;text-align:center;border:1px solid}
+.qc .qn{font-size:22px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.qc .ql{font-size:9px;text-transform:uppercase;letter-spacing:.07em;font-family:'IBM Plex Mono',monospace;margin-top:3px}
+.qc.mk{background:var(--gl);border-color:rgba(46,160,67,.4)}.qc.mk .qn{color:var(--g2)}.qc.mk .ql{color:var(--g)}
+.qc.ex{background:var(--aml);border-color:rgba(210,153,34,.4)}.qc.ex .qn{color:var(--am2)}.qc.ex .ql{color:var(--am)}
+.qc.ab{background:var(--bl);border-color:rgba(31,111,235,.4)}.qc.ab .qn{color:var(--b2)}.qc.ab .ql{color:var(--b)}
+.qc.md{background:var(--rl);border-color:rgba(218,54,51,.4)}.qc.md .qn{color:var(--r2)}.qc.md .ql{color:var(--r)}
+
+/* === SNAP === */
 .snap-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--bdr2);border-radius:20px;padding:5px 6px 5px 12px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--tx2);margin:0 6px 6px 0}
 .snap-chip .ts{color:var(--tx3);font-size:9px}
-.snap-chip .x{cursor:pointer;color:var(--tx3);padding:2px 6px;border-radius:50%}
-.snap-chip .x:hover{color:var(--red);background:var(--rbg)}
-.snap-empty{color:var(--tx3);font-size:11px;font-family:'IBM Plex Mono',monospace;padding:8px 0}
-.snap-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
-.snap-sel{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:7px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;outline:none;min-width:160px}
-/* QUADRANT */
-.quad-card{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.qc{border-radius:6px;padding:10px 12px;text-align:center;border:1px solid}
-.qc .qn{font-size:18px;font-weight:600;font-family:'IBM Plex Mono',monospace}
-.qc .ql{font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono',monospace;margin-top:3px}
-.qc.markup{background:var(--gbg);border-color:var(--green2)}.qc.markup .qn{color:var(--green)}
-.qc.exh{background:var(--ambg);border-color:#cc8800}.qc.exh .qn{color:var(--amber)}
-.qc.abs{background:var(--bbg);border-color:var(--blue)}.qc.abs .qn{color:var(--blue)}
-.qc.mkd{background:var(--rbg);border-color:var(--red2)}.qc.mkd .qn{color:var(--red)}
+.snap-chip .x{cursor:pointer;color:var(--tx3);padding:2px 6px;border-radius:50%;transition:all .15s}
+.snap-chip .x:hover{color:var(--r2);background:var(--rl)}
+.snap-sel{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:7px 10px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;outline:none}
+
+/* === BADGE === */
+.badge{font-size:10px;padding:2px 7px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:500}
+.badge.buy{background:var(--gl);color:var(--g2)}.badge.sell{background:var(--rl);color:var(--r2)}
+.badge.warn{background:var(--aml);color:var(--am2)}.badge.pur{background:var(--pul);color:var(--pu2)}
+.badge.info{background:var(--bl);color:var(--b2)}.badge.teal{background:var(--tel);color:var(--te2)}
+
+/* === CONFLUENCE SCORE RING === */
+.ring-wrap{display:flex;align-items:center;gap:24px;padding:16px 0}
+.ring{position:relative;width:120px;height:120px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--bg4);stroke-width:10}
+.ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-num{font-size:26px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.ring-lbl{font-size:9px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+.cond-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;flex:1}
+.cond-item{background:var(--bg3);border:1px solid var(--bdr);border-radius:6px;padding:10px 12px}
+.cond-ic{font-size:14px;margin-bottom:4px}
+.cond-n{font-size:11px;color:var(--tx);font-weight:500}
+.cond-d{font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+
+/* === SCALE SELECTOR === */
+.scale-row{display:flex;align-items:center;gap:12px;margin:8px 0;font-size:11px;flex-wrap:wrap}
+.scale-row label{display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--tx2);font-family:'IBM Plex Mono',monospace}
+.scale-row input[type=radio]{accent-color:var(--acc)}
+
+/* === MINI MT INPUT === */
+.mti{background:transparent;border:none;color:var(--tx);font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;padding:3px 5px;outline:none;border-radius:3px}
+.mti:focus{background:var(--bg4)}
+.mti.ci{color:var(--b2);font-weight:600;text-transform:uppercase}
+.mti.nb{color:var(--g2)}.mti.ns{color:var(--r2)}.mti.fq{color:var(--pu2)}
+.cat-sel{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:3px 6px;border-radius:3px;font-size:10px;font-family:'IBM Plex Mono',monospace;outline:none;width:100%}
+.del-btn{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:12px;padding:2px 6px;transition:color .15s}
+.del-btn:hover{color:var(--r2)}
+
+/* === RESPONSIVE GRIDS === */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.sidenav{display:none}.main{max-width:100vw}}
+
+/* === EXTRAS === */
+.sep{height:1px;background:var(--bdr);margin:12px 0}
+.prev-t{width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',monospace}
+.prev-t th{background:var(--bg3);color:var(--tx3);padding:5px 8px;text-align:left;border-bottom:1px solid var(--bdr);font-size:10px;text-transform:uppercase;white-space:nowrap}
+.prev-t td{padding:4px 8px;border-bottom:1px solid var(--bdr);color:var(--tx2)}
+.mt{width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',monospace}
+.mt th{background:var(--bg3);color:var(--tx3);padding:6px 8px;text-align:left;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--bdr);white-space:nowrap}
+.mt td{padding:2px 4px;border-bottom:1px solid var(--bdr)}
+.msig{padding:5px 10px;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;display:inline-block}
+.dark-trap-row{background:rgba(218,54,51,.04);border-left:2px solid var(--r)}
+.dark-trap-pos{background:rgba(46,160,67,.04);border-left:2px solid var(--g)}
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-l">
-    <div class="logo">BFA<span>/IDX</span></div>
-    <div class="tbadge"><span id="hdr-tk">—</span><span class="pr" id="hdr-pr">—</span><span id="hdr-chg" style="color:var(--red)">—</span></div>
-    <div class="tbadge" style="font-size:10px;color:var(--tx3)"><span id="hdr-pd">Belum ada data</span></div>
-  </div>
-  <div class="hst" id="hst">SIAP — MASUKKAN DATA LALU KLIK ANALISIS</div>
+  <div class="logo">BFA<span>/v3</span></div>
+  <div class="hchip"><div class="hpulse"></div><span id="h-tk" style="color:var(--tx);font-weight:600">—</span><span class="hprice" id="h-pr">—</span><span id="h-chg" style="color:var(--r2)">—</span></div>
+  <div class="hchip" style="font-size:10px;color:var(--tx3)" id="h-pd">Belum ada data</div>
+  <div class="hchip" id="h-sig-chip" style="display:none"></div>
+  <div class="hst" id="h-st">SOVEREIGN ALPHA — INPUT DATA & ANALISIS</div>
 </div>
 
+<div class="layout">
+<!-- SIDENAV -->
+<div class="sidenav">
+  <div class="snav-lbl">Input</div>
+  <div class="snav-item on" onclick="nav('input')"><div class="snav-dot"></div>Data & Parse</div>
+  <div class="snav-sep"></div>
+  <div class="snav-lbl">Analytics</div>
+  <div class="snav-item" onclick="nav('confluence')"><div class="snav-dot"></div>Confluence</div>
+  <div class="snav-item" onclick="nav('flow')"><div class="snav-dot"></div>Broker Flow</div>
+  <div class="snav-item" onclick="nav('bandar')"><div class="snav-dot"></div>Bandarmology</div>
+  <div class="snav-item" onclick="nav('atv')"><div class="snav-dot"></div>ATV / HNWI</div>
+  <div class="snav-item" onclick="nav('vpa')"><div class="snav-dot"></div>VPA Quadrant</div>
+  <div class="snav-sep"></div>
+  <div class="snav-lbl">Pro</div>
+  <div class="snav-item" onclick="nav('dark')"><div class="snav-dot"></div>Dark Pool</div>
+  <div class="snav-item" onclick="nav('velocity')"><div class="snav-dot"></div>Velocity / Snap</div>
+  <div class="snav-item" onclick="nav('table')"><div class="snav-dot"></div>Full Table</div>
+</div>
+
+<!-- MAIN CONTENT -->
 <div class="main">
 
-<!-- ===================== INPUT SECTION ===================== -->
-<div class="isec">
-  <div class="isec-t">Input data broker summary</div>
-  <div class="tabs">
-    <div class="tab on" id="tab-paste" onclick="sw('paste')">Paste TSV</div>
-    <div class="tab" id="tab-manual" onclick="sw('manual')">Manual entry</div>
-    <div class="tab" id="tab-vpa" onclick="sw('vpa')">VPA Data</div>
-    <div class="tab" id="tab-meta" onclick="sw('meta')">Info saham</div>
-    <div class="tab" id="tab-sample" onclick="sw('sample')">Contoh BBCA</div>
-  </div>
-
-  <!-- PASTE TAB -->
-  <div id="tp-paste">
-    <div class="alert a-info">
-      <strong>Format kolom (pisahkan TAB):</strong>&nbsp; Kode | Nama | Lot | NBVal | NSVal<br>
-      Nilai boleh rupiah penuh (5650600000000) atau suffix 5650.6B / 7.2M. Header otomatis dilewati. Kode di-trim ke 2 huruf.
-    </div>
-    <textarea class="paste-area" id="paste-raw" placeholder="SQ&#9;BCA Sekuritas&#9;8200000&#9;5650600000000&#9;0&#10;ZP&#9;Maybank Sekuritas&#9;-16800000&#9;0&#9;11386300000000"></textarea>
-    <div class="scale-row">
-      <span style="color:var(--tx3)">Satuan nilai:</span>
-      <label><input type="radio" name="sc" value="auto" checked onchange="updateScaleHint()"> Auto-detect</label>
-      <label><input type="radio" name="sc" value="rupiah" onchange="updateScaleHint()"> Rupiah penuh (÷1M)</label>
-      <label><input type="radio" name="sc" value="miliar" onchange="updateScaleHint()"> Miliar/B</label>
-      <span class="scale-hint" id="scale-hint"></span>
-    </div>
-
-    <div class="divider"></div>
-    <div style="font-size:10px;color:var(--purple);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Data frekuensi (opsional — untuk ATV/HNWI Detector)</div>
-    <div class="alert a-pur">Format: <code>Kode [TAB] Frekuensi</code>, satu broker per baris. Dipakai untuk menghitung Average Transaction Value (Value ÷ Frekuensi) — mendeteksi broker "ritel" yang sebenarnya HNWI/institusi tersembunyi.</div>
-    <textarea class="paste-area sm" id="freq-raw" placeholder="SQ&#9;74335&#10;ZP&#9;200257&#10;XL&#9;1086857"></textarea>
-
-    <div id="parse-status" style="margin-top:8px"></div>
-    <div id="prev-area" class="hidden" style="margin-top:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace">
-          PREVIEW — <span id="prev-cnt" style="color:var(--green)">0</span> broker &nbsp;·&nbsp;
-          <span id="prev-buys" style="color:var(--green)">0 buy</span> &nbsp;·&nbsp;
-          <span id="prev-sells" style="color:var(--red)">0 sell</span> &nbsp;·&nbsp;
-          Skala: <span id="prev-scale" style="color:var(--amber)">—</span>
-        </span>
-        <span id="prev-warns" style="font-size:10px;color:var(--amber);font-family:'IBM Plex Mono',monospace"></span>
+<!-- ═══════════════ INPUT ═══════════════ -->
+<div class="section on" id="s-input">
+  <div class="card">
+    <div class="card-h"><span class="card-t">Data Broker Summary</span><span class="badge info" id="parse-cnt">0 broker</span></div>
+    <div class="card-b">
+      <div class="tabs">
+        <div class="tab on" id="tb-paste" onclick="sw('paste')">Paste TSV</div>
+        <div class="tab" id="tb-manual" onclick="sw('manual')">Manual</div>
+        <div class="tab" id="tb-vpa" onclick="sw('vpa')">VPA Data</div>
+        <div class="tab" id="tb-dark" onclick="sw('dark')">Dark Pool</div>
+        <div class="tab" id="tb-meta" onclick="sw('meta')">Info Saham</div>
+        <div class="tab" id="tb-sample" onclick="sw('sample')">Demo BBCA</div>
       </div>
-      <div class="sy" style="max-height:200px">
-        <table class="prev-t">
-          <thead><tr><th>Kode</th><th>Nama</th><th>Kat</th><th style="text-align:right">NBVal</th><th style="text-align:right">NSVal</th><th style="text-align:right">Net (B)</th></tr></thead>
-          <tbody id="prev-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
-  <!-- MANUAL TAB -->
-  <div id="tp-manual" class="hidden">
-    <div class="alert a-info">Nilai langsung dalam <strong>Miliar IDR (B)</strong>. Kolom Freq opsional untuk ATV.</div>
-    <div style="overflow-x:auto;margin-bottom:10px">
-      <table class="mt">
-        <thead><tr>
-          <th style="width:55px">Kode</th><th style="width:190px">Nama broker</th><th style="width:95px">Kategori</th>
-          <th style="width:105px">NBVal (B)</th><th style="width:105px">NSVal (B)</th><th style="width:70px">Freq</th><th style="width:35px"></th>
-        </tr></thead>
-        <tbody id="manual-tbody"></tbody>
-      </table>
-    </div>
-    <div class="br" style="margin-top:6px">
-      <button class="btn bs bsm" onclick="addMRow()">+ Tambah baris</button>
-      <button class="btn bs bsm" onclick="addMRow(5)">+ 5 baris</button>
-      <button class="btn bs bsm" onclick="clearManual()">Bersihkan tabel</button>
-    </div>
-  </div>
-
-  <!-- VPA TAB -->
-  <div id="tp-vpa" class="hidden">
-    <div class="alert a-info">
-      <strong>Volume Price Analysis</strong> — deteksi Exhaustion (Bull Trap) &amp; Absorption (Healthy Retracement).<br>
-      Format: <code>Tanggal [TAB] Close [TAB] Volume</code>, satu baris per hari, urut dari hari paling lama ke terbaru.
-    </div>
-    <textarea class="paste-area" id="vpa-raw" placeholder="01/06/2026&#9;5200&#9;850000000&#10;02/06/2026&#9;5150&#9;620000000&#10;03/06/2026&#9;5075&#9;410000000"></textarea>
-  </div>
-
-  <!-- META TAB -->
-  <div id="tp-meta" class="hidden">
-    <div class="alert a-info">Opsional — lengkapi untuk KPI perubahan harga yang akurat.</div>
-    <div class="igrid">
-      <div class="ig"><label>Kode saham</label><input id="m-ticker" placeholder="BBCA" style="text-transform:uppercase"></div>
-      <div class="ig"><label>Dari</label><input id="m-from" placeholder="01/01/2026"></div>
-      <div class="ig"><label>Sampai</label><input id="m-to" placeholder="08/06/2026"></div>
-      <div class="ig"><label>FNVal (B) override</label><input id="m-fn" placeholder="auto-hitung" class="s" type="number"></div>
-      <div class="ig"><label>TVal (B) total</label><input id="m-tv" placeholder="157964" type="number"></div>
-      <div class="ig"><label>Harga sekarang</label><input id="m-pr" placeholder="5075" type="number"></div>
-      <div class="ig"><label>Harga awal periode</label><input id="m-po" placeholder="8175" type="number"></div>
-      <div class="ig"><label>Threshold ATV (B/transaksi)</label><input id="m-atv" placeholder="1" value="1" type="number" step="0.1"></div>
-      <div class="ig"><label>Whitelist broker (pisah koma)</label><input id="m-whitelist" placeholder="SQ,XL,CC"></div>
-    </div>
-  </div>
-
-  <!-- SAMPLE TAB -->
-  <div id="tp-sample" class="hidden">
-    <div class="alert a-info">Load data BBCA YTD 2026 + contoh frekuensi &amp; VPA sebagai demo lengkap.</div>
-    <button class="btn bp" onclick="loadSample()">Load data BBCA demo (full)</button>
-  </div>
-
-  <div class="divider"></div>
-  <div class="br">
-    <button class="btn bp" onclick="doAnalysis()">Parse &amp; analisis</button>
-    <button class="btn bs" onclick="resetAll()">Reset semua</button>
-    <span id="last-run" style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace"></span>
-  </div>
-</div>
-
-<!-- ===================== KPI ===================== -->
-<div class="kpis" id="kpis" style="display:none">
-  <div class="kpi b"><div class="kl">Total nilai</div><div class="kv b" id="k-tv">—</div><div class="ks" id="k-tv2">—</div></div>
-  <div class="kpi" id="k-fn-c"><div class="kl">FNVal asing</div><div class="kv" id="k-fn">—</div><div class="ks" id="k-fn2">—</div></div>
-  <div class="kpi" id="k-pc-c"><div class="kl">Perubahan harga</div><div class="kv" id="k-pc">—</div><div class="ks" id="k-pc2">—</div></div>
-  <div class="kpi g"><div class="kl">Broker net buy</div><div class="kv g" id="k-bc">—</div><div class="ks" id="k-bc2">—</div></div>
-  <div class="kpi r"><div class="kl">Broker net sell</div><div class="kv r" id="k-sc">—</div><div class="ks" id="k-sc2">—</div></div>
-  <div class="kpi a"><div class="kl">Sinyal flow</div><div class="kv a" id="k-sig">—</div><div class="ks" id="k-sig2">—</div></div>
-</div>
-
-<!-- ===================== CONFLUENCE PANEL ===================== -->
-<div class="panel full" id="confluence-panel" style="display:none">
-  <div class="ph"><span class="pt">Confluence Signal — Bandarmology × ATV × VPA</span></div>
-  <div class="pb" id="confluence-body"></div>
-</div>
-
-<!-- ===================== DASHBOARD (existing flow) ===================== -->
-<div id="dash" style="display:none">
-  <div class="dash">
-    <div class="panel">
-      <div class="ph"><span class="pt">Net flow per broker (top 15)</span><div style="display:flex;gap:8px;font-size:10px;font-family:'IBM Plex Mono',monospace"><span style="color:var(--green)">■ BUY</span><span style="color:var(--red)">■ SELL</span></div></div>
-      <div class="pb"><div style="position:relative;height:300px"><canvas id="ch-flow"></canvas></div></div>
-    </div>
-    <div class="panel">
-      <div class="ph"><span class="pt">Flow per kategori A/B/C</span></div>
-      <div class="pb"><div style="position:relative;height:200px;margin-bottom:12px"><canvas id="ch-cat"></canvas></div><div id="cat-sum"></div></div>
-    </div>
-  </div>
-  <div class="dash">
-    <div class="panel"><div class="ph"><span class="pt">Top net buy</span><span class="badge buy" id="b-buy">—</span></div><div class="pb sy" id="list-buy"></div></div>
-    <div class="panel"><div class="ph"><span class="pt">Top net sell</span><span class="badge sell" id="b-sell">—</span></div><div class="pb sy" id="list-sell"></div></div>
-  </div>
-  <div class="dash">
-    <div class="panel"><div class="ph"><span class="pt">Interpretasi &amp; sinyal</span></div><div class="pb sy" style="max-height:400px" id="sig-area"></div></div>
-    <div class="panel">
-      <div class="ph"><span class="pt">Tabel lengkap</span><input type="text" id="tsearch" placeholder="Cari kode/nama..." oninput="filterT(this.value)" style="background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:3px 8px;border-radius:3px;font-size:10px;font-family:'IBM Plex Mono',monospace;outline:none;width:140px"></div>
-      <div style="padding:0"><div class="sy"><table class="dt"><thead><tr><th>Kode</th><th>Nama</th><th>Kat</th><th>Net (B)</th><th>Posisi</th></tr></thead><tbody id="tbl-body"></tbody></table></div></div>
-    </div>
-  </div>
-  <div class="dash">
-    <div class="panel"><div class="ph"><span class="pt">Komposisi buy vs sell</span></div><div class="pb"><div style="position:relative;height:240px"><canvas id="ch-donut"></canvas></div></div></div>
-    <div class="panel"><div class="ph"><span class="pt">Net per kategori A / B / C</span></div><div class="pb"><div style="position:relative;height:240px"><canvas id="ch-cbar"></canvas></div></div></div>
-  </div>
-</div>
-
-<!-- ===================== BANDARMOLOGY + ATV ===================== -->
-<div id="bandar-section" style="display:none">
-  <div class="dash">
-    <div class="panel">
-      <div class="ph"><span class="pt">Bandarmology Concentration Index</span></div>
-      <div class="pb">
-        <div class="gauge-wrap">
-          <div class="gauge-track"><div class="gauge-fill" id="bandar-fill" style="width:0%;background:var(--green)">0%</div><div class="gauge-thresh" style="left:60%"></div></div>
-          <div class="gauge-label-row"><span>0%</span><span style="color:var(--amber)">Threshold 60%</span><span>100%</span></div>
+      <!-- PASTE -->
+      <div id="tp-paste">
+        <div class="alert ai"><strong>Format kolom (pisah TAB):</strong>&nbsp;Kode | Nama | Lot | NBVal | NSVal<br>Nilai boleh Rupiah penuh (5650600000000) atau suffix B/M. Header otomatis dilewati.</div>
+        <textarea id="raw-paste" placeholder="SQ&#9;BCA Sekuritas&#9;8200000&#9;5650600000000&#9;0&#10;ZP&#9;Maybank Sekuritas&#9;-16800000&#9;0&#9;11386300000000"></textarea>
+        <div class="scale-row">
+          <span style="color:var(--tx3)">Satuan:</span>
+          <label><input type="radio" name="sc" value="auto" checked> Auto-detect</label>
+          <label><input type="radio" name="sc" value="rupiah"> Rupiah penuh</label>
+          <label><input type="radio" name="sc" value="miliar"> Miliar/B</label>
+          <span style="color:var(--am2);font-size:10px" id="sc-hint"></span>
         </div>
-        <div id="bandar-detail"></div>
+        <div class="sep"></div>
+        <div style="font-size:10px;color:var(--pu2);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Frekuensi Transaksi (untuk ATV/HNWI Detector)</div>
+        <div class="alert ap">Format: <code>Kode [TAB] Frekuensi</code> per baris. Dipakai menghitung ATV = Total Value ÷ Frekuensi untuk deteksi akun "ritel" yang sebenarnya HNWI tersembunyi.</div>
+        <textarea id="raw-freq" placeholder="SQ&#9;74335&#10;ZP&#9;200257&#10;XL&#9;1086857" class="sm"></textarea>
+        <div id="parse-status" style="margin-top:8px"></div>
+        <div class="sy" style="max-height:180px;margin-top:12px" id="prev-area" style="display:none">
+          <table class="prev-t">
+            <thead><tr><th>Kode</th><th>Nama</th><th>Kat</th><th style="text-align:right">NBVal</th><th style="text-align:right">NSVal</th><th style="text-align:right">Net(B)</th></tr></thead>
+            <tbody id="prev-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MANUAL -->
+      <div id="tp-manual" style="display:none">
+        <div class="alert ai">Nilai langsung dalam Miliar IDR (B). Freq opsional untuk ATV.</div>
+        <div style="overflow-x:auto;margin-bottom:10px">
+          <table class="mt"><thead><tr><th style="width:52px">Kode</th><th style="width:180px">Nama</th><th style="width:90px">Kategori</th><th style="width:100px">NBVal(B)</th><th style="width:100px">NSVal(B)</th><th style="width:70px">Freq</th><th style="width:32px"></th></tr></thead><tbody id="m-tbody"></tbody></table>
+        </div>
+        <div class="br"><button class="btn bs" style="font-size:11px;padding:5px 12px" onclick="addMRow()">+ Baris</button><button class="btn bs" style="font-size:11px;padding:5px 12px" onclick="addMRow(5)">+5</button><button class="btn bs" style="font-size:11px;padding:5px 12px" onclick="document.getElementById('m-tbody').innerHTML='';addMRow(6)">Reset</button></div>
+      </div>
+
+      <!-- VPA -->
+      <div id="tp-vpa" style="display:none">
+        <div class="alert ai"><strong>VPA Data</strong> — Format: <code>Tanggal [TAB] Close [TAB] Volume</code>, urut dari hari paling lama ke terbaru.</div>
+        <textarea id="raw-vpa" placeholder="01/06/2026&#9;5200&#9;850000000&#10;02/06/2026&#9;5150&#9;620000000&#10;03/06/2026&#9;5075&#9;410000000"></textarea>
+      </div>
+
+      <!-- DARK POOL -->
+      <div id="tp-dark" style="display:none">
+        <div class="alert ap"><strong>Dark Pool / Pasar Negosiasi</strong> — Masukkan transaksi crossing. Delta Premium vs Diskon menentukan apakah ini akumulasi nyata atau insider bailout.</div>
+        <div class="alert aw">Rule: Delta &gt;+2% (crossing premium) = BULLISH akumulasi nyata. Delta negatif (crossing diskon) = ❌ Insider bailout — HINDARI.</div>
+        <div id="dp-rows"></div>
+        <button class="btn bs" style="margin-top:8px;font-size:11px;padding:5px 12px" onclick="addDPRow()">+ Tambah crossing</button>
+      </div>
+
+      <!-- META -->
+      <div id="tp-meta" style="display:none">
+        <div class="alert ai">Opsional — untuk KPI harga, ATV threshold, dan whitelist broker.</div>
+        <div class="irow">
+          <div class="ig"><label>Kode Saham</label><input id="m-tk" placeholder="BBCA" style="text-transform:uppercase"></div>
+          <div class="ig"><label>Periode Dari</label><input id="m-from" placeholder="01/01/2026"></div>
+          <div class="ig"><label>Sampai</label><input id="m-to" placeholder="08/06/2026"></div>
+          <div class="ig"><label>Harga Sekarang</label><input id="m-pr" type="number" placeholder="5075"></div>
+          <div class="ig"><label>Harga Awal Periode</label><input id="m-po" type="number" placeholder="8175"></div>
+          <div class="ig"><label>Total Nilai (B)</label><input id="m-tv" type="number" placeholder="157964"></div>
+          <div class="ig"><label>FNVal Override (B)</label><input id="m-fn" type="number" placeholder="auto-hitung"></div>
+          <div class="ig"><label>ATV Threshold (B/tx)</label><input id="m-atv" type="number" value="1" step="0.1"></div>
+          <div class="ig"><label>Whitelist Broker (koma)</label><input id="m-wl" placeholder="SQ,XL,CC"></div>
+        </div>
+      </div>
+
+      <!-- SAMPLE -->
+      <div id="tp-sample" style="display:none">
+        <div class="alert ao">Load data BBCA YTD 2026 sebagai demo lengkap — broker flow, frekuensi, VPA, dark pool, dan meta sekaligus.</div>
+        <button class="btn bp" onclick="loadSample()">Load Demo BBCA (Full)</button>
+      </div>
+
+      <div class="sep"></div>
+      <div class="br">
+        <button class="btn bp" onclick="doAnalysis()">▶ Parse & Analisis</button>
+        <button class="btn bs" onclick="resetAll()">Reset Semua</button>
+        <span style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace" id="last-run"></span>
       </div>
     </div>
-    <div class="panel">
-      <div class="ph"><span class="pt">ATV / HNWI Detector</span><span class="badge pur" id="atv-count">0 flagged</span></div>
-      <div class="pb sy" id="atv-list"></div>
-    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-grid" id="kpi-grid" style="display:none">
+    <div class="kpi b"><div class="kl">Total Nilai</div><div class="kv b" id="k-tv">—</div><div class="ks" id="k-tv2">—</div></div>
+    <div class="kpi" id="k-fn-c"><div class="kl">FNVal Asing</div><div class="kv" id="k-fn">—</div><div class="ks" id="k-fn2">—</div></div>
+    <div class="kpi" id="k-pc-c"><div class="kl">Perubahan Harga</div><div class="kv" id="k-pc">—</div><div class="ks" id="k-pc2">—</div></div>
+    <div class="kpi g"><div class="kl">Net Buyers</div><div class="kv g" id="k-bc">—</div><div class="ks" id="k-bc2">—</div></div>
+    <div class="kpi r"><div class="kl">Net Sellers</div><div class="kv r" id="k-sc">—</div><div class="ks" id="k-sc2">—</div></div>
+    <div class="kpi am"><div class="kl">Bandar Index</div><div class="kv am" id="k-bi">—</div><div class="ks" id="k-bi2">—</div></div>
   </div>
 </div>
 
-<!-- ===================== VELOCITY / SNAPSHOT MANAGER ===================== -->
-<div class="panel full" id="snap-section" style="display:none">
-  <div class="ph"><span class="pt">Velocity of Accumulation — Snapshot Manager</span></div>
-  <div class="pb">
-    <div class="alert a-pur">Simpan hasil analisis hari ini sebagai snapshot, lalu bandingkan dengan snapshot lain (mis. minggu lalu) untuk melihat akselerasi akumulasi broker tertentu. Snapshot tersimpan selama tab ini terbuka — gunakan Export/Import untuk menyimpan permanen ke file.</div>
-    <div class="snap-row">
-      <div class="ig" style="flex:1;min-width:160px"><label>Label snapshot</label><input id="snap-label" placeholder="08 Jun 2026"></div>
-      <button class="btn bpu" onclick="saveSnapshot()">💾 Simpan snapshot ini</button>
-      <button class="btn bs bsm" onclick="exportAllSnapshots()">⬇ Export semua (.json)</button>
-      <label class="btn bs bsm" style="cursor:pointer">⬆ Import (.json)<input type="file" accept=".json" onchange="importSnapshotFile(this)" style="display:none"></label>
+<!-- ═══════════════ CONFLUENCE ═══════════════ -->
+<div class="section" id="s-confluence">
+  <div class="card">
+    <div class="card-h"><span class="card-t">Confluence Score — Bandarmology × ATV × VPA × Dark Pool</span><span class="badge info" id="conf-count">—</span></div>
+    <div class="card-b">
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle class="ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+          </svg>
+          <div class="ring-text"><div class="ring-num" id="ring-num">0%</div><div class="ring-lbl">Confluence</div></div>
+        </div>
+        <div class="cond-grid" id="cond-grid"></div>
+      </div>
+      <div id="conf-verdict"></div>
     </div>
-    <div id="snap-list" class="snap-empty">Belum ada snapshot tersimpan.</div>
-
-    <div class="divider"></div>
-    <div class="snap-row">
-      <div class="ig"><label>Snapshot "Before"</label><select class="snap-sel" id="snap-before"><option value="">— pilih —</option></select></div>
-      <div class="ig"><label>Snapshot "After"</label><select class="snap-sel" id="snap-after"><option value="">— pilih —</option></select></div>
-      <button class="btn bp" onclick="compareSnapshots()">Bandingkan</button>
-    </div>
-    <div id="compare-result"></div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="card-t">Sinyal Interpretasi</span></div>
+    <div class="card-b sy" style="max-height:280px" id="sig-area"></div>
   </div>
 </div>
 
-<!-- ===================== VPA QUADRANT ===================== -->
-<div id="vpa-section" style="display:none">
-  <div class="panel full">
-    <div class="ph"><span class="pt">VPA Quadrant — Exhaustion &amp; Absorption Detector</span></div>
-    <div class="pb">
-      <div class="quad-card">
-        <div class="qc markup"><div class="qn" id="qc-markup">0</div><div class="ql">Markup (Valid)</div></div>
-        <div class="qc exh"><div class="qn" id="qc-exh">0</div><div class="ql">Exhaustion (Bull Trap)</div></div>
-        <div class="qc abs"><div class="qn" id="qc-abs">0</div><div class="ql">Absorption (Healthy)</div></div>
-        <div class="qc mkd"><div class="qn" id="qc-mkd">0</div><div class="ql">Markdown (Distribusi)</div></div>
+<!-- ═══════════════ FLOW ═══════════════ -->
+<div class="section" id="s-flow">
+  <div class="kpi-grid" id="kpi-flow" style="display:none">
+    <div class="kpi g"><div class="kl">Total Buy</div><div class="kv g" id="f-buy">—</div></div>
+    <div class="kpi r"><div class="kl">Total Sell</div><div class="kv r" id="f-sell">—</div></div>
+    <div class="kpi b"><div class="kl">Net Flow</div><div class="kv b" id="f-net">—</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-h"><span class="card-t">Net Flow per Broker (Top 15)</span><div style="display:flex;gap:8px;font-size:10px;font-family:'IBM Plex Mono',monospace"><span style="color:var(--g2)">■ BUY</span><span style="color:var(--r2)">■ SELL</span></div></div><div class="card-b"><div style="position:relative;height:320px"><canvas id="ch-flow" role="img" aria-label="Bar chart net flow per broker">Flow chart</canvas></div></div></div>
+    <div class="card"><div class="card-h"><span class="card-t">Flow per Kategori A/B/C</span></div><div class="card-b"><div style="position:relative;height:200px;margin-bottom:12px"><canvas id="ch-cat" role="img" aria-label="Bar chart flow per kategori">Cat chart</canvas></div><div id="cat-sum"></div></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-h"><span class="card-t">Top Net Buyers</span><span class="badge buy" id="b-buy">—</span></div><div class="card-b sy" id="list-buy"></div></div>
+    <div class="card"><div class="card-h"><span class="card-t">Top Net Sellers</span><span class="badge sell" id="b-sell">—</span></div><div class="card-b sy" id="list-sell"></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-h"><span class="card-t">Komposisi Buy vs Sell</span></div><div class="card-b"><div style="position:relative;height:240px"><canvas id="ch-donut" role="img" aria-label="Donut chart buy vs sell">Donut</canvas></div></div></div>
+    <div class="card"><div class="card-h"><span class="card-t">Net per Kategori</span></div><div class="card-b"><div style="position:relative;height:240px"><canvas id="ch-cbar" role="img" aria-label="Bar chart net per kategori">Cbar</canvas></div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ BANDAR ═══════════════ -->
+<div class="section" id="s-bandar">
+  <div class="card">
+    <div class="card-h"><span class="card-t">Bandarmology Concentration Index</span></div>
+    <div class="card-b">
+      <div class="gauge-wrap">
+        <div class="gauge-track"><div class="gauge-fill" id="bandar-fill" style="width:0%;color:#000">0%</div><div class="gauge-thresh" style="left:60%"></div></div>
+        <div class="gauge-labels"><span>0%</span><span style="color:var(--am2)">Threshold 60%</span><span>100%</span></div>
+      </div>
+      <div id="bandar-detail"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="card-t">Distribusi Konsentrasi Top 5</span></div>
+    <div class="card-b"><div style="position:relative;height:260px"><canvas id="ch-bandar" role="img" aria-label="Chart konsentrasi top 5 broker">Bandar chart</canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ ATV ═══════════════ -->
+<div class="section" id="s-atv">
+  <div class="card">
+    <div class="card-h"><span class="card-t">ATV / HNWI Detector — Nominee Illusion Breaker</span><span class="badge pur" id="atv-count">0 flagged</span></div>
+    <div class="card-b">
+      <div class="alert ap">Broker "ritel" dengan ATV &gt; threshold teridentifikasi sebagai potensial HNWI atau institusi yang menyembunyikan jejak (Nominee Illusion). Formula: ATV = (NBVal + NSVal) ÷ Frekuensi</div>
+      <div id="atv-list"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="card-t">ATV Chart — Top 15 Broker</span></div>
+    <div class="card-b"><div style="position:relative;height:260px"><canvas id="ch-atv" role="img" aria-label="Bar chart ATV per broker">ATV chart</canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ VPA ═══════════════ -->
+<div class="section" id="s-vpa">
+  <div class="card">
+    <div class="card-h"><span class="card-t">VPA Quadrant — Exhaustion & Absorption Detector</span></div>
+    <div class="card-b">
+      <div class="quad-grid">
+        <div class="qc mk"><div class="qn" id="qc-mk">0</div><div class="ql">Markup / Valid</div></div>
+        <div class="qc ex"><div class="qn" id="qc-ex">0</div><div class="ql">Exhaustion / Bull Trap</div></div>
+        <div class="qc ab"><div class="qn" id="qc-ab">0</div><div class="ql">Absorption / Healthy</div></div>
+        <div class="qc md"><div class="qn" id="qc-md">0</div><div class="ql">Markdown / Distribusi</div></div>
       </div>
       <div id="vpa-latest"></div>
     </div>
   </div>
-  <div class="dash">
-    <div class="panel"><div class="ph"><span class="pt">Quadrant scatter — ΔPrice vs ΔVolume</span></div><div class="pb"><div style="position:relative;height:280px"><canvas id="ch-vpa"></canvas></div></div></div>
-    <div class="panel"><div class="ph"><span class="pt">Klasifikasi harian</span></div><div class="pb sy" id="vpa-table"></div></div>
+  <div class="g2">
+    <div class="card"><div class="card-h"><span class="card-t">VPA Scatter — ΔPrice vs ΔVolume</span></div><div class="card-b"><div style="position:relative;height:280px"><canvas id="ch-vpa" role="img" aria-label="Scatter chart VPA">VPA scatter</canvas></div></div></div>
+    <div class="card"><div class="card-h"><span class="card-t">Klasifikasi Harian</span></div><div class="card-b sy" id="vpa-table"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ DARK POOL ═══════════════ -->
+<div class="section" id="s-dark">
+  <div class="card">
+    <div class="card-h"><span class="card-t">Dark Pool / Pasar Negosiasi Analyzer</span><span class="badge warn" id="dp-count">0 crossing</span></div>
+    <div class="card-b">
+      <div class="alert ap">Deteksi crossing Pasar Negosiasi. Delta Premium (+) = institusi akumulasi agresif. Delta Diskon (-) = insider bailout / tukar guling afiliasi — EXIT SIGNAL.</div>
+      <div id="dp-results"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="card-t">Dark Pool Delta Chart</span></div>
+    <div class="card-b"><div style="position:relative;height:240px"><canvas id="ch-dp" role="img" aria-label="Bar chart dark pool delta">DP chart</canvas></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ VELOCITY ═══════════════ -->
+<div class="section" id="s-velocity">
+  <div class="card">
+    <div class="card-h"><span class="card-t">Velocity of Accumulation — Snapshot Manager</span></div>
+    <div class="card-b">
+      <div class="alert ap">Simpan hasil analisis sebagai snapshot. Bandingkan dua snapshot untuk deteksi akselerasi akumulasi broker tertentu (Velocity of Accumulation Signal).</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+        <div class="ig"><label>Label Snapshot</label><input id="snap-lbl" placeholder="08 Jun 2026" style="width:180px"></div>
+        <button class="btn bpu" onclick="saveSnap()">Simpan Snapshot</button>
+        <button class="btn bs" style="font-size:11px" onclick="exportSnaps()">Export JSON</button>
+        <label class="btn bs" style="font-size:11px;cursor:pointer">Import JSON<input type="file" accept=".json" onchange="importSnap(this)" style="display:none"></label>
+      </div>
+      <div id="snap-list" style="margin-bottom:14px;color:var(--tx3);font-size:11px;font-family:'IBM Plex Mono',monospace">Belum ada snapshot.</div>
+      <div class="sep"></div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px">
+        <div class="ig"><label>Snapshot "Before"</label><select class="snap-sel" id="snap-before"><option value="">— pilih —</option></select></div>
+        <div class="ig"><label>Snapshot "After"</label><select class="snap-sel" id="snap-after"><option value="">— pilih —</option></select></div>
+        <button class="btn bp" onclick="compareSnaps()">Bandingkan</button>
+      </div>
+      <div id="compare-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TABLE ═══════════════ -->
+<div class="section" id="s-table">
+  <div class="card">
+    <div class="card-h"><span class="card-t">Tabel Lengkap</span><input type="text" id="tsearch" placeholder="Cari kode/nama..." oninput="filterT(this.value)" style="background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:4px 10px;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;outline:none;width:160px"></div>
+    <div class="sy"><table class="dt"><thead><tr><th>Kode</th><th>Nama</th><th>Kat</th><th>Net(B)</th><th>ATV(B/tx)</th><th>Posisi</th></tr></thead><tbody id="tbl-body"></tbody></table></div>
   </div>
 </div>
 
 </div><!-- /main -->
-<div class="footer">
-  BROKER FLOW ANALYZER v2.0 — IDX &nbsp;|&nbsp; 100% offline · no server · free forever &nbsp;|&nbsp; Data: BEI Broker Summary<br>
-  <span style="color:var(--tx3)">Bukan rekomendasi investasi. Tools ini membantu visualisasi pola flow &amp; volume — keputusan trading tetap tanggung jawab pengguna.</span>
-</div>
+</div><!-- /layout -->
 
 <script>
 // ============================================================
 // GLOBALS
 // ============================================================
-let BD = [], CHT = {}, ROWS = [], activeTab = 'paste';
-let SNAPSHOTS = []; // {id, label, ts, data:[...]}
-let VPA_DATA = [];  // {date, close, vol, pctP, pctV, cls}
+let BD=[], SNAPS=[], VD=[], DP=[], CHT={}, ROWS=[], DP_ROW_ID=0;
+const CAT={YU:'A',AK:'A',ZP:'A',KZ:'A',BB:'A',BK:'A',RX:'A',AI:'A',DX:'A',LG:'A',IF:'A',RF:'A',AG:'A',DP:'A',GW:'A',TP:'A',XL:'B',CC:'B',YP:'B',PD:'B',XC:'B',MG:'B',CP:'B',NI:'B',OD:'B',GR:'B',AZ:'B',KK:'B',HP:'B',DR:'B',BQ:'B',XA:'B',MI:'B',KI:'B',RS:'B',EP:'B',AO:'B',DH:'B',SQ:'B',LS:'B',HD:'B',RO:'B',YB:'B',PP:'B',CD:'B',IN:'B',OK:'B',ES:'B',FS:'B',YJ:'B',PI:'B',FO:'B',BS:'B',IH:'B',AT:'B',SS:'B',MU:'B',PC:'B',PG:'C',RG:'C',SA:'C',IU:'C',YO:'C',AD:'C',RB:'C',SF:'C',ZR:'C',AR:'C',ID:'C',II:'C',TS:'C',GA:'C',AF:'C',GI:'C',BF:'C',IT:'C',DD:'C',IC:'C',PO:'C',QA:'C',SH:'C',DU:'C',BR:'C'};
+const gcat=c=>CAT[c]||'B';
+const TT={backgroundColor:'#161b22',borderColor:'#21283a',borderWidth:1,titleColor:'#e6edf3',bodyColor:'#8b949e'};
+const VCL={markup:'#2ea043',exh:'#d29922',abs:'#1f6feb',mkd:'#da3633'};
+const VLB={markup:'Markup (Valid)',exh:'Exhaustion / Bull Trap',abs:'Absorption / Healthy',mkd:'Markdown / Distribusi'};
 
 // ============================================================
-// CATEGORY MAP
+// UTILS
 // ============================================================
-const CAT = {
-  YU:'A', AK:'A', ZP:'A', KZ:'A', BB:'A', BK:'A', RX:'A',
-  AI:'A', DX:'A', LG:'A', IF:'A', RF:'A', AG:'A', DP:'A', GW:'A', TP:'A',
-  XL:'B', CC:'B', YP:'B', PD:'B', XC:'B', MG:'B', CP:'B',
-  NI:'B', OD:'B', GR:'B', AZ:'B', KK:'B', HP:'B', DR:'B',
-  BQ:'B', XA:'B', MI:'B', KI:'B', RS:'B', EP:'B', AO:'B',
-  DH:'B', SQ:'B', LS:'B', HD:'B', RO:'B', YB:'B', PP:'B',
-  CD:'B', IN:'B', OK:'B', ES:'B', FS:'B', YJ:'B', PI:'B',
-  FO:'B', BS:'B', IH:'B', AT:'B', SS:'B', MU:'B', PC:'B',
-  PG:'C', RG:'C', SA:'C', IU:'C', YO:'C', AD:'C', RB:'C',
-  SF:'C', ZR:'C', AR:'C', ID:'C', II:'C', TS:'C', GA:'C',
-  AF:'C', GI:'C', BF:'C', IT:'C', DD:'C', IC:'C', PO:'C',
-  QA:'C', SH:'C', DU:'C', BR:'C',
-};
-const getCat = c => CAT[c] || 'B';
+const $=id=>document.getElementById(id);
+const set=(id,v)=>$(id)&&($(id).textContent=v);
+function fB(v){const a=Math.abs(v);if(a>=1000)return(a/1000).toFixed(2)+'T';if(a>=1)return a.toFixed(2)+'B';if(a>=.001)return(a*1000).toFixed(1)+'M';return(a*1e6).toFixed(0)+'jt';}
+function fKT(v){const a=Math.abs(v);return(v<0?'-':'')+(a>=1000?(a/1000).toFixed(1)+'T':a.toFixed(0)+'B');}
+function fN(v){return v?Number(v).toLocaleString('id'):'—';}
 
-// ============================================================
-// NUMBER PARSER
-// ============================================================
-function parseNum(raw) {
-  if (raw === null || raw === undefined || raw === '') return 0;
-  let s = String(raw).trim().replace(/\s/g, '');
-  if (!s || s === '-' || s === '—' || s === '–') return 0;
-  const neg = s.startsWith('-');
-  s = s.replace(/^[+-]/, '');
-  let mult = 1;
-  const sfx = s.match(/^([\d.,]+)([MmBbTt])$/);
-  if (sfx) { s = sfx[1]; const f = sfx[2].toUpperCase(); mult = f==='M'?1e6:f==='B'?1e9:1e12; }
-  const nd=(s.match(/\./g)||[]).length, nc=(s.match(/,/g)||[]).length;
+function parseNum(r){
+  if(!r||r===''||r==='-'||r==='—')return 0;
+  let s=String(r).trim().replace(/\s/g,'');
+  const neg=s.startsWith('-');s=s.replace(/^[+-]/,'');
+  let m=1;const sf=s.match(/^([\d.,]+)([MmBbTt])$/);
+  if(sf){s=sf[1];const f=sf[2].toUpperCase();m=f==='M'?1e6:f==='B'?1e9:1e12;}
+  const nd=(s.match(/\./g)||[]).length,nc=(s.match(/,/g)||[]).length;
   let n;
-  if (nd>1) n=parseFloat(s.replace(/\./g,''));
-  else if (nc>1) n=parseFloat(s.replace(/,/g,''));
-  else if (nd===1&&nc===1) n = s.lastIndexOf('.')>s.lastIndexOf(',') ? parseFloat(s.replace(',','')) : parseFloat(s.replace('.','').replace(',','.'));
-  else if (nc===1) { const after=s.split(',')[1]; n=(after&&after.length<=2)?parseFloat(s.replace(',','.')):parseFloat(s.replace(',','')); }
+  if(nd>1)n=parseFloat(s.replace(/\./g,''));
+  else if(nc>1)n=parseFloat(s.replace(/,/g,''));
+  else if(nd===1&&nc===1)n=s.lastIndexOf('.')>s.lastIndexOf(',')?parseFloat(s.replace(',','')):parseFloat(s.replace('.','').replace(',','.'));
+  else if(nc===1){const a=s.split(',')[1];n=(a&&a.length<=2)?parseFloat(s.replace(',','.')):parseFloat(s.replace(',',''));}
   else n=parseFloat(s);
-  if (isNaN(n)) return 0;
-  return (neg?-1:1)*n*mult;
+  return isNaN(n)?0:(neg?-1:1)*n*m;
 }
 
-function detectScale(rawNBs, rawNSs) {
-  const ov = document.querySelector('input[name=sc]:checked')?.value || 'auto';
-  if (ov==='rupiah') return 1e9;
-  if (ov==='miliar') return 1;
+function detectScale(rawNBs,rawNSs){
+  const ov=document.querySelector('input[name=sc]:checked')?.value||'auto';
+  if(ov==='rupiah')return 1e9;if(ov==='miliar')return 1;
   const vals=[...rawNBs,...rawNSs].map(Math.abs).filter(v=>v>0);
-  if (!vals.length) return 1;
-  return Math.max(...vals) >= 1e8 ? 1e9 : 1;
+  return vals.length&&Math.max(...vals)>=1e8?1e9:1;
 }
 
 // ============================================================
-// PARSE TSV (broker data)
+// PARSE TSV
 // ============================================================
-function parseTSV(text) {
-  const lines = text.trim().split('\n').filter(l=>l.trim());
-  if (!lines.length) return { rows:[], scale:1, warns:[] };
-  const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
-  const fc = lines[0].split(sep)[0].trim().replace(/[^A-Za-z]/g,'').toUpperCase();
-  const startIdx = (fc.length>4 || ['KODE','NBY','NSL','CODE','NO'].includes(fc)) ? 1 : 0;
-  const rawRows=[], warns=[];
-  for (let i=startIdx;i<lines.length;i++) {
-    const parts = lines[i].split(sep).map(p=>p.trim());
-    if (parts.length<2) continue;
-    const rawC = parts[0].replace(/[^A-Za-z]/g,'').toUpperCase();
-    const code = rawC.slice(0,2);
-    if (code.length<2) { warns.push('Baris '+(i+1)+': kode "'+parts[0]+'" tidak valid'); continue; }
-    let numStart=-1, nameEnd=1;
-    for (let j=1;j<parts.length;j++) {
-      const c = parts[j].replace(/[\s,\.]/g,'').replace(/^-/,'');
-      if (/^[\d]+[MBT]?$/.test(c) || /^[\d]+\.[\d]*[MBT]?$/.test(c.replace(',','.'))) { numStart=j; nameEnd=j; break; }
-    }
-    if (numStart<0) { warns.push('Baris '+(i+1)+': tidak ada kolom numerik'); continue; }
-    const name = parts.slice(1,nameEnd).join(' ').trim() || code;
-    const nums = parts.slice(numStart).map(parseNum);
-    let lot=0, rNB=0, rNS=0;
-    if (nums.length>=5) { lot=nums[0]; rNB=nums[1]; rNS=nums[4]; }
-    else if (nums.length===4) { lot=nums[0]; rNB=nums[1]; rNS=nums[3]; }
-    else if (nums.length===3) { lot=nums[0]; rNB=nums[1]; rNS=nums[2]; }
-    else if (nums.length===2) { rNB=nums[0]; rNS=nums[1]; }
-    else { rNB=nums[0]; }
-    rawRows.push({ c:code, n:name, cat:getCat(code), lot, rNB:Math.abs(rNB), rNS:Math.abs(rNS) });
+function parseTSV(text){
+  const lines=text.trim().split('\n').filter(l=>l.trim());
+  if(!lines.length)return{rows:[],scale:1,warns:[]};
+  const sep=lines[0].includes('\t')?'\t':lines[0].includes(';')?';':',';
+  const fc=lines[0].split(sep)[0].trim().replace(/[^A-Za-z]/g,'').toUpperCase();
+  const si=(fc.length>4||['KODE','NBY','NSL','CODE','NO'].includes(fc))?1:0;
+  const raw=[],warns=[];
+  for(let i=si;i<lines.length;i++){
+    const p=lines[i].split(sep).map(x=>x.trim());
+    if(p.length<2)continue;
+    const rc=p[0].replace(/[^A-Za-z]/g,'').toUpperCase(),code=rc.slice(0,2);
+    if(code.length<2){warns.push('Baris '+(i+1)+': kode "'+p[0]+'" tidak valid');continue;}
+    let ns=-1,ne=1;
+    for(let j=1;j<p.length;j++){const c=p[j].replace(/[\s,.]/g,'').replace(/^-/,'');if(/^[\d]+[MBT]?$/.test(c)||/^[\d]+\.[\d]*[MBT]?$/.test(c.replace(',','.'))){ns=j;ne=j;break;}}
+    if(ns<0){warns.push('Baris '+(i+1)+': tidak ada kolom numerik');continue;}
+    const name=p.slice(1,ne).join(' ').trim()||code;
+    const nums=p.slice(ns).map(parseNum);
+    let lot=0,rNB=0,rNS=0;
+    if(nums.length>=5){lot=nums[0];rNB=nums[1];rNS=nums[4];}
+    else if(nums.length===4){lot=nums[0];rNB=nums[1];rNS=nums[3];}
+    else if(nums.length===3){lot=nums[0];rNB=nums[1];rNS=nums[2];}
+    else if(nums.length===2){rNB=nums[0];rNS=nums[1];}
+    else{rNB=nums[0];}
+    raw.push({c:code,n:name,cat:gcat(code),lot,rNB:Math.abs(rNB),rNS:Math.abs(rNS)});
   }
-  const scale = detectScale(rawRows.map(r=>r.rNB), rawRows.map(r=>r.rNS));
-  const rows = rawRows.map(r=>({ c:r.c, n:r.n, cat:r.cat, lot:r.lot, nb:r.rNB/scale, ns:r.rNS/scale, freq:0 }));
-  return { rows, scale, warns };
+  const scale=detectScale(raw.map(r=>r.rNB),raw.map(r=>r.rNS));
+  return{rows:raw.map(r=>({c:r.c,n:r.n,cat:r.cat,lot:r.lot,nb:r.rNB/scale,ns:r.rNS/scale,freq:0})),scale,warns};
 }
 
-// ============================================================
-// PARSE FREQUENCY (auxiliary)
-// ============================================================
-function parseFreqText(text) {
-  const map = {};
-  if (!text || !text.trim()) return map;
-  const lines = text.trim().split('\n').filter(l=>l.trim());
-  lines.forEach(l => {
-    const sep = l.includes('\t') ? '\t' : /\s{2,}|,/;
-    const parts = l.split(sep).map(p=>p.trim());
-    if (parts.length<2) return;
-    const code = parts[0].replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,2);
-    const freq = parseNum(parts[1]);
-    if (code.length===2 && freq>0) map[code]=freq;
+function parseFreqText(text){
+  const map={};
+  if(!text||!text.trim())return map;
+  text.trim().split('\n').filter(l=>l.trim()).forEach(l=>{
+    const sep=l.includes('\t')?'\t':/\s{2,}|,/;
+    const p=l.split(sep).map(x=>x.trim());
+    if(p.length<2)return;
+    const code=p[0].replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,2);
+    const freq=parseNum(p[1]);
+    if(code.length===2&&freq>0)map[code]=freq;
   });
   return map;
 }
 
-// ============================================================
-// PARSE MANUAL
-// ============================================================
-function parseManual() {
+function parseManual(){
   const rows=[];
-  document.querySelectorAll('#manual-tbody tr').forEach(tr=>{
-    const inp = tr.querySelectorAll('input');
-    const sel = tr.querySelector('select');
-    const code = (inp[0]?.value||'').trim().toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);
-    if (code.length<2) return;
-    const name = (inp[1]?.value||'').trim() || code;
-    const cat  = sel?.value || getCat(code);
-    const nb   = Math.abs(parseFloat(inp[2]?.value)||0);
-    const ns   = Math.abs(parseFloat(inp[3]?.value)||0);
-    const freq = Math.abs(parseFloat(inp[4]?.value)||0);
-    rows.push({ c:code, n:name, cat, nb, ns, freq });
-  });
-  return rows;
+  document.querySelectorAll('#m-tbody tr').forEach(tr=>{
+    const i=tr.querySelectorAll('input'),s=tr.querySelector('select');
+    const code=(i[0]?.value||'').trim().toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);
+    if(code.length<2)return;
+    const name=(i[1]?.value||'').trim()||code,cat=s?.value||gcat(code);
+    rows.push({c:code,n:name,cat,nb:Math.abs(parseFloat(i[2]?.value)||0),ns:Math.abs(parseFloat(i[3]?.value)||0),freq:Math.abs(parseFloat(i[4]?.value)||0)});
+  });return rows;
 }
 
-function updateScaleHint() {
-  const raw = document.getElementById('paste-raw').value;
-  if (!raw.trim()) { document.getElementById('scale-hint').textContent=''; return; }
-  const val = document.querySelector('input[name=sc]:checked')?.value || 'auto';
-  if (val==='auto') {
-    const nums = raw.match(/-?[\d.]+[MBT]?/g) || [];
-    const maxV = Math.max(0, ...nums.map(parseNum).map(Math.abs));
-    document.getElementById('scale-hint').textContent = '→ Terdeteksi: '+(maxV>=1e8?'Rupiah penuh (÷1M)':'Miliar/B');
-  } else document.getElementById('scale-hint').textContent='';
+function parseVPA(text){
+  if(!text||!text.trim())return[];
+  const lines=text.trim().split('\n').filter(l=>l.trim());
+  const days=lines.map(l=>{const sep=l.includes('\t')?'\t':/\s{2,}|,/;const p=l.split(sep).map(x=>x.trim());return{date:p[0],close:parseNum(p[1]),vol:parseNum(p[2])};}).filter(d=>d.date&&d.close>0);
+  const out=[];
+  for(let i=1;i<days.length;i++){
+    const prev=days[i-1],cur=days[i];
+    const pP=prev.close?((cur.close-prev.close)/prev.close*100):0;
+    const pV=prev.vol?((cur.vol-prev.vol)/prev.vol*100):0;
+    let cls;if(pP>=0&&pV>=0)cls='markup';else if(pP>=0&&pV<0)cls='exh';else if(pP<0&&pV<0)cls='abs';else cls='mkd';
+    out.push({date:cur.date,close:cur.close,vol:cur.vol,pctP:pP,pctV:pV,cls});
+  }return out;
 }
 
 // ============================================================
-// TABS
+// TAB SWITCHING (INPUT PANEL)
 // ============================================================
-function sw(id) {
-  ['paste','manual','vpa','meta','sample'].forEach(t=>{
-    document.getElementById('tp-'+t).classList.add('hidden');
-    document.getElementById('tab-'+t).classList.remove('on');
-  });
-  document.getElementById('tp-'+id).classList.remove('hidden');
-  document.getElementById('tab-'+id).classList.add('on');
-  if (['paste','manual'].includes(id)) activeTab = id;
+const TABS=['paste','manual','vpa','dark','meta','sample'];
+function sw(id){
+  TABS.forEach(t=>{$('tp-'+t).style.display=t===id?'block':'none';$('tb-'+t).classList.toggle('on',t===id);});
+  if(['paste','manual'].includes(id))window._activeTab=id;
 }
 
 // ============================================================
-// MANUAL TABLE
+// SIDENAV
 // ============================================================
-function addMRow(n, data) {
-  if (typeof n==='number' && n>1) { for(let i=0;i<n;i++) addMRow(1,null); return; }
-  const d = data||{};
-  const tb = document.getElementById('manual-tbody');
-  const tr = document.createElement('tr');
-  const cat = d.cat || getCat((d.c||'').toUpperCase()) || 'B';
-  tr.innerHTML = `
-    <td><input class="ci" value="${d.c||''}" placeholder="SQ" oninput="autoCat(this)"></td>
-    <td><input value="${d.n||''}" placeholder="Nama broker"></td>
-    <td><select class="cat-sel">
-      <option value="A"${cat==='A'?' selected':''}>A — Asing inst.</option>
-      <option value="B"${cat==='B'?' selected':''}>B — Hybrid</option>
-      <option value="C"${cat==='C'?' selected':''}>C — Kecil</option>
-    </select></td>
-    <td><input class="nb" type="number" value="${d.nb||''}" placeholder="0" step="0.1" min="0"></td>
-    <td><input class="ns" type="number" value="${d.ns||''}" placeholder="0" step="0.1" min="0"></td>
-    <td><input class="fq" type="number" value="${d.freq||''}" placeholder="0" step="1" min="0"></td>
-    <td><button class="del-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
-  tb.appendChild(tr);
+const SECTIONS=['input','confluence','flow','bandar','atv','vpa','dark','velocity','table'];
+function nav(id){
+  SECTIONS.forEach(s=>{$('s-'+s)?.classList.toggle('on',s===id);document.querySelectorAll('.snav-item').forEach(el=>{if(el.getAttribute('onclick')==="nav('"+s+"')")el.classList.toggle('on',s===id);});});
 }
-function autoCat(inp) {
-  const code = inp.value.trim().toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);
-  if (code.length<2) return;
-  const sel = inp.closest('tr').querySelector('select');
-  if (sel) sel.value = getCat(code);
+
+// ============================================================
+// MANUAL TABLE + DARK POOL ROWS
+// ============================================================
+function addMRow(n,d){
+  if(typeof n==='number'&&n>1){for(let i=0;i<n;i++)addMRow(1,null);return;}
+  d=d||{};const cat=d.cat||gcat((d.c||'').toUpperCase())||'B';
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input class="mti ci" value="${d.c||''}" placeholder="SQ" oninput="autoCat(this)"></td><td><input class="mti" value="${d.n||''}" placeholder="Nama broker"></td><td><select class="cat-sel"><option value="A"${cat==='A'?' selected':''}>A-Asing</option><option value="B"${cat==='B'?' selected':''}>B-Hybrid</option><option value="C"${cat==='C'?' selected':''}>C-Kecil</option></select></td><td><input class="mti nb" type="number" value="${d.nb||''}" placeholder="0" min="0"></td><td><input class="mti ns" type="number" value="${d.ns||''}" placeholder="0" min="0"></td><td><input class="mti fq" type="number" value="${d.freq||''}" placeholder="0" min="0"></td><td><button class="del-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
+  $('m-tbody').appendChild(tr);
 }
-function clearManual() { document.getElementById('manual-tbody').innerHTML=''; for(let i=0;i<8;i++) addMRow(); }
+function autoCat(inp){const c=inp.value.trim().toUpperCase().replace(/[^A-Z]/g,'').slice(0,2);if(c.length<2)return;const s=inp.closest('tr').querySelector('select');if(s)s.value=gcat(c);}
+
+function addDPRow(d){
+  d=d||{};const id='dp-'+(DP_ROW_ID++);
+  const div=document.createElement('div');
+  div.id=id;div.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.innerHTML=`<div class="ig"><label>Tanggal</label><input placeholder="08/06/2026" value="${d.date||''}" class="dp-date"></div><div class="ig"><label>Ticker</label><input placeholder="BREN" value="${d.tk||''}" class="dp-tk" style="text-transform:uppercase"></div><div class="ig"><label>Harga Nego (Rp)</label><input type="number" placeholder="5100" value="${d.nego||''}" class="dp-nego"></div><div class="ig"><label>Harga Pasar (Rp)</label><input type="number" placeholder="5000" value="${d.mkt||''}" class="dp-mkt"></div><button class="del-btn" onclick="document.getElementById('${id}').remove()" style="margin-bottom:6px">✕</button>`;
+  $('dp-rows').appendChild(div);
+}
+
+function collectDPRows(){
+  const res=[];
+  document.querySelectorAll('#dp-rows > div').forEach(div=>{
+    const date=div.querySelector('.dp-date')?.value||'—';
+    const tk=(div.querySelector('.dp-tk')?.value||'').toUpperCase()||'—';
+    const nego=parseFloat(div.querySelector('.dp-nego')?.value)||0;
+    const mkt=parseFloat(div.querySelector('.dp-mkt')?.value)||0;
+    if(nego&&mkt)res.push({date,tk,nego,mkt,delta:(nego-mkt)/mkt*100});
+  });return res;
+}
 
 // ============================================================
 // SAMPLE DATA
 // ============================================================
-const SAMPLE_TSV = `SQ\tBCA Sekuritas\t8200000\t5650600000000\t0
-XL\tStockbit Sekuritas\t6000000\t3961500000000\t0
-CC\tMandiri Sekuritas\t3900000\t2848400000000\t0
-YP\tMirae Asset Sekuritas\t3800000\t2514900000000\t0
-PD\tIndo Premier Sekuritas\t3000000\t1988900000000\t0
-XC\tAjaib Sekuritas Asia\t2100000\t1387300000000\t0
-DX\tBahana Sekuritas\t1600000\t1115600000000\t0
-NI\tBNI Sekuritas\t1500000\t998800000000\t0
-LG\tTrimegah Sekuritas\t1400000\t927100000000\t0
-GR\tPanin Sekuritas\t1400000\t926000000000\t0
-ZP\tMaybank Sekuritas\t-16800000\t0\t11386300000000
-AK\tUBS Sekuritas\t-8500000\t0\t5828700000000
-KZ\tCLSA Sekuritas\t-6700000\t0\t4440900000000
-RX\tMacquarie Sekuritas\t-5800000\t0\t3632600000000
-YU\tCGS International\t-3300000\t0\t2459000000000
-BB\tVerdhana Sekuritas\t-853312\t0\t674400000000
-BK\tJP Morgan Sekuritas\t-818358\t0\t627000000000
-AG\tKiwoom Sekuritas\t-705246\t0\t441100000000
-TP\tOCBC Sekuritas\t-619063\t0\t294400000000
-FO\tForte Global Sekuritas\t-10\t0\t7200000
-YO\tAmantara Sekuritas\t-2200\t0\t185000000000`;
+const SMP_TSV=`SQ\tBCA Sekuritas\t8200000\t5650600000000\t0\nXL\tStockbit Sekuritas\t6000000\t3961500000000\t0\nCC\tMandiri Sekuritas\t3900000\t2848400000000\t0\nYP\tMirae Asset\t3800000\t2514900000000\t0\nPD\tIndo Premier\t3000000\t1988900000000\t0\nXC\tAjaib Sekuritas\t2100000\t1387300000000\t0\nDX\tBahana Sekuritas\t1600000\t1115600000000\t0\nNI\tBNI Sekuritas\t1500000\t998800000000\t0\nLG\tTrimegah Sekuritas\t1400000\t927100000000\t0\nGR\tPanin Sekuritas\t1400000\t926000000000\t0\nZP\tMaybank Sekuritas\t-16800000\t0\t11386300000000\nAK\tUBS Sekuritas\t-8500000\t0\t5828700000000\nKZ\tCLSA Sekuritas\t-6700000\t0\t4440900000000\nRX\tMacquarie Sekuritas\t-5800000\t0\t3632600000000\nYU\tCGS International\t-3300000\t0\t2459000000000\nBB\tVerdhana Sekuritas\t-853312\t0\t674400000000\nBK\tJP Morgan\t-818358\t0\t627000000000\nAG\tKiwoom Sekuritas\t-705246\t0\t441100000000\nTP\tOCBC Sekuritas\t-619063\t0\t294400000000\nYO\tAmantara Sekuritas\t-2200\t0\t185000000000`;
+const SMP_FREQ=`SQ\t74335\nZP\t200257\nXL\t1086857\nAK\t447098\nYO\t850\nCC\t416376`;
+const SMP_VPA=`02/06/2026\t6200\t610000000\n03/06/2026\t6050\t580000000\n04/06/2026\t5900\t720000000\n05/06/2026\t5850\t340000000\n06/06/2026\t5700\t290000000\n08/06/2026\t5075\t950000000`;
 
-const SAMPLE_FREQ = `SQ\t74335
-ZP\t200257
-XL\t1086857
-AK\t447098
-YO\t850
-CC\t416376
-FO\t306`;
-
-const SAMPLE_VPA = `02/06/2026\t6200\t610000000
-03/06/2026\t6050\t580000000
-04/06/2026\t5900\t720000000
-05/06/2026\t5850\t340000000
-06/06/2026\t5700\t290000000
-08/06/2026\t5075\t950000000`;
-
-const SAMPLE_META = { tk:'BBCA', from:'01/01/2026', to:'08/06/2026', fn:-32606.3, tv:157964, pr:5075, po:8175 };
-
-function loadSample() {
-  document.getElementById('paste-raw').value = SAMPLE_TSV;
-  document.getElementById('freq-raw').value  = SAMPLE_FREQ;
-  document.getElementById('vpa-raw').value   = SAMPLE_VPA;
-  document.getElementById('m-ticker').value  = SAMPLE_META.tk;
-  document.getElementById('m-from').value    = SAMPLE_META.from;
-  document.getElementById('m-to').value      = SAMPLE_META.to;
-  document.getElementById('m-fn').value      = SAMPLE_META.fn;
-  document.getElementById('m-tv').value      = SAMPLE_META.tv;
-  document.getElementById('m-pr').value      = SAMPLE_META.pr;
-  document.getElementById('m-po').value      = SAMPLE_META.po;
-  document.getElementById('m-whitelist').value = 'SQ,XL,CC';
-  sw('paste'); activeTab='paste';
-  updateScaleHint();
+function loadSample(){
+  $('raw-paste').value=SMP_TSV;$('raw-freq').value=SMP_FREQ;$('raw-vpa').value=SMP_VPA;
+  $('m-tk').value='BBCA';$('m-from').value='01/01/2026';$('m-to').value='08/06/2026';
+  $('m-pr').value='5075';$('m-po').value='8175';$('m-tv').value='157964';$('m-fn').value='-32606.3';$('m-atv').value='1';$('m-wl').value='SQ,XL,CC';
+  // add sample dark pool
+  $('dp-rows').innerHTML='';
+  addDPRow({date:'08/06/2026',tk:'BBCA',nego:5100,mkt:5075});
+  addDPRow({date:'07/06/2026',tk:'BBCA',nego:4950,mkt:5100});
+  sw('paste');window._activeTab='paste';
   doAnalysis();
 }
 
 // ============================================================
 // RESET
 // ============================================================
-function resetAll() {
-  BD=[]; ROWS=[]; VPA_DATA=[];
-  document.getElementById('paste-raw').value='';
-  document.getElementById('freq-raw').value='';
-  document.getElementById('vpa-raw').value='';
-  document.getElementById('parse-status').innerHTML='';
-  document.getElementById('prev-area').classList.add('hidden');
-  document.getElementById('kpis').style.display='none';
-  document.getElementById('dash').style.display='none';
-  document.getElementById('bandar-section').style.display='none';
-  document.getElementById('vpa-section').style.display='none';
-  document.getElementById('confluence-panel').style.display='none';
-  document.getElementById('hst').textContent='SIAP — MASUKKAN DATA LALU KLIK ANALISIS';
-  ['hdr-tk','hdr-pr','hdr-chg'].forEach(id=>$(id).textContent='—');
-  $('hdr-pd').textContent='Belum ada data';
-  $('last-run').textContent='';
-  $('scale-hint').textContent='';
-  Object.values(CHT).forEach(c=>{try{c.destroy();}catch(e){}});
-  CHT={};
+function resetAll(){
+  BD=[];SNAPS=[];VD=[];DP=[];ROWS=[];
+  $('raw-paste').value='';$('raw-freq').value='';$('raw-vpa').value='';$('dp-rows').innerHTML='';
+  $('parse-status').innerHTML='';$('prev-body').innerHTML='';
+  $('kpi-grid').style.display='none';
+  Object.values(CHT).forEach(c=>{try{c.destroy();}catch(e){}});CHT={};
+  ['h-tk','h-pr','h-chg'].forEach(id=>set(id,'—'));set('h-pd','Belum ada data');
+  set('h-st','SOVEREIGN ALPHA — INPUT DATA & ANALISIS');
+  $('h-sig-chip').style.display='none';
 }
 
 // ============================================================
-// MAIN ANALYSIS TRIGGER
+// SHOW STATUS
 // ============================================================
-function doAnalysis() {
-  let rows=[], scale=1, warns=[];
+function showSt(type,msg){const m={ok:'ao',warn:'aw',info:'ai'};$('parse-status').innerHTML=`<div class="alert ${m[type]||'ai'}" style="margin-top:8px">${msg}</div>`;}
 
-  if (activeTab==='manual') {
-    rows = parseManual();
-    if (!rows.length) { showStatus('warn','⚠ Tabel manual kosong. Isi dulu minimal 1 baris.'); return; }
+// ============================================================
+// ANALYSIS TRIGGER
+// ============================================================
+function doAnalysis(){
+  let rows=[];
+  if(window._activeTab==='manual'){
+    rows=parseManual();
+    if(!rows.length){showSt('warn','⚠ Tabel manual kosong.');return;}
   } else {
-    const raw = document.getElementById('paste-raw').value;
-    if (!raw.trim()) { showStatus('warn','⚠ Textarea kosong! Paste data broker dulu.'); return; }
-    const result = parseTSV(raw);
-    rows = result.rows; scale = result.scale; warns = result.warns;
-    if (!rows.length) { showStatus('warn','⚠ Tidak ada data valid. Periksa format kolom.'); return; }
-
-    const buyers = rows.filter(r=>r.nb>r.ns), sellers = rows.filter(r=>r.ns>=r.nb);
-    $('prev-cnt').textContent=rows.length; $('prev-buys').textContent=buyers.length+' buy';
-    $('prev-sells').textContent=sellers.length+' sell'; $('prev-warns').textContent=warns.length?warns.length+' baris dilewati':'';
-    $('prev-scale').textContent = scale===1e9?'Rupiah penuh (÷1M)':'Miliar/B';
-    $('prev-body').innerHTML = rows.map(r=>{
-      const net=r.nb-r.ns;
-      return `<tr><td style="color:${r.cat==='A'?'var(--blue)':r.cat==='B'?'var(--green)':'var(--tx3)'};font-weight:600">${r.c}</td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.n}</td>
-      <td style="color:${r.cat==='A'?'var(--blue)':r.cat==='B'?'var(--green)':'var(--tx3)'}">${r.cat}</td>
-      <td class="${r.nb>0?'pos':''}" style="text-align:right">${r.nb>0?'+'+fB(r.nb):'—'}</td>
-      <td class="${r.ns>0?'neg':''}" style="text-align:right">${r.ns>0?'-'+fB(r.ns):'—'}</td>
-      <td class="${net>0?'pos':'neg'}" style="text-align:right">${(net>=0?'+':'')+fB(net)}</td></tr>`;
-    }).join('');
-    document.getElementById('prev-area').classList.remove('hidden');
-    showStatus('ok','✓ '+rows.length+' broker ter-parse | skala: '+(scale===1e9?'Rupiah ÷1M':'Miliar')+(warns.length?' | '+warns.length+' dilewati':''));
+    const raw=$('raw-paste').value;
+    if(!raw.trim()){showSt('warn','⚠ Textarea kosong! Paste data broker dulu.');return;}
+    const{rows:r,scale,warns}=parseTSV(raw);
+    if(!r.length){showSt('warn','⚠ Tidak ada data valid. Periksa format.');return;}
+    rows=r;
+    showSt('ok','✓ '+r.length+' broker ter-parse | skala: '+(scale===1e9?'Rupiah ÷1M':'Miliar')+(warns.length?' | '+warns.length+' dilewati':''));
+    const prev=$('prev-body');
+    prev.innerHTML=r.map(b=>{const net=b.nb-b.ns;return`<tr><td style="color:${b.cat==='A'?'var(--b2)':b.cat==='B'?'var(--g2)':'var(--tx3)'};font-weight:600">${b.c}</td><td>${b.n}</td><td>${b.cat}</td><td class="${b.nb>0?'pos':''}" style="text-align:right">${b.nb>0?'+'+fB(b.nb):'—'}</td><td class="${b.ns>0?'neg':''}" style="text-align:right">${b.ns>0?'-'+fB(b.ns):'—'}</td><td class="${net>=0?'pos':'neg'}" style="text-align:right">${(net>=0?'+':'')+fB(net)}</td></tr>`;}).join('');
   }
 
-  // merge frequency
-  const freqMap = parseFreqText(document.getElementById('freq-raw').value);
-  rows = rows.map(r => ({...r, freq: r.freq || freqMap[r.c] || 0 }));
+  const fm=parseFreqText($('raw-freq').value);
+  rows=rows.map(r=>({...r,freq:r.freq||fm[r.c]||0}));
+  BD=rows.map(r=>({...r,net:r.nb-r.ns,buy:(r.nb-r.ns)>=0}));
+  VD=parseVPA($('raw-vpa').value);
+  DP=collectDPRows();
 
-  BD = rows.map(r=>({...r, net:r.nb-r.ns, buy:(r.nb-r.ns)>=0}));
-
-  // parse VPA if filled
-  VPA_DATA = parseVPA(document.getElementById('vpa-raw').value);
+  set('parse-cnt',BD.length+' broker');
+  $('kpi-grid').style.display='grid';
+  $('kpi-flow').style.display='grid';
+  set('last-run','Analisis: '+new Date().toLocaleString('id'));
 
   run();
-}
-
-function showStatus(type,msg) {
-  const c = type==='warn'?'a-warn':type==='ok'?'a-ok':'a-info';
-  $('parse-status').innerHTML = '<div class="alert '+c+'" style="margin-top:8px">'+msg+'</div>';
-}
-
-// ============================================================
-// VPA PARSER
-// ============================================================
-function parseVPA(text) {
-  if (!text || !text.trim()) return [];
-  const lines = text.trim().split('\n').filter(l=>l.trim());
-  const days = lines.map(l=>{
-    const sep = l.includes('\t')?'\t':/\s{2,}|,/;
-    const p = l.split(sep).map(x=>x.trim());
-    return { date:p[0], close:parseNum(p[1]), vol:parseNum(p[2]) };
-  }).filter(d=>d.date && d.close>0);
-
-  const out=[];
-  for (let i=1;i<days.length;i++) {
-    const prev=days[i-1], cur=days[i];
-    const pctP = prev.close ? ((cur.close-prev.close)/prev.close*100) : 0;
-    const pctV = prev.vol ? ((cur.vol-prev.vol)/prev.vol*100) : 0;
-    let cls;
-    if (pctP>=0 && pctV>=0) cls='markup';
-    else if (pctP>=0 && pctV<0) cls='exh';
-    else if (pctP<0 && pctV<0) cls='abs';
-    else cls='mkd';
-    out.push({ date:cur.date, close:cur.close, vol:cur.vol, pctP, pctV, cls });
-  }
-  return out;
-}
-
-const VPA_LABEL = { markup:'Markup (Valid)', exh:'Exhaustion (Bull Trap)', abs:'Absorption (Healthy)', mkd:'Markdown (Distribusi)' };
-const VPA_COLOR = { markup:'#00d084', exh:'#ffb84d', abs:'#4da6ff', mkd:'#ff4d6a' };
-
-// ============================================================
-// RUN ANALYSIS
-// ============================================================
-function run() {
-  if (!BD.length) return;
-
-  const ticker = ($('m-ticker').value||'SAHAM').toUpperCase();
-  const dfrom = $('m-from').value||'—', dto = $('m-to').value||'—';
-  const fnIn = parseFloat($('m-fn').value);
-  const tv = parseFloat($('m-tv').value)||0;
-  const pr = parseFloat($('m-pr').value)||0;
-  const po = parseFloat($('m-po').value)||0;
-  const atvThresh = parseFloat($('m-atv').value)||1;
-  const whitelist = ($('m-whitelist').value||'').toUpperCase().split(',').map(s=>s.trim()).filter(Boolean);
-
-  const buyers=BD.filter(b=>b.buy), sellers=BD.filter(b=>!b.buy);
-  const tbuy=buyers.reduce((s,b)=>s+b.net,0), tsell=sellers.reduce((s,b)=>s+Math.abs(b.net),0);
-  const fnAuto=BD.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
-  const fn = !isNaN(fnIn)?fnIn:fnAuto;
-  const pchg = po?((pr-po)/po*100):0, pabs=pr-po;
-
-  $('hdr-tk').textContent=ticker;
-  $('hdr-pr').textContent=pr?pr.toLocaleString('id'):'—';
-  $('hdr-chg').textContent=(pr&&po)?(pchg>=0?'+':'')+pchg.toFixed(2)+'%':'—';
-  $('hdr-chg').style.color=pchg>=0?'var(--green)':'var(--red)';
-  $('hdr-pd').textContent=dfrom+' → '+dto;
-  $('hst').textContent='RUN: '+new Date().toLocaleTimeString('id');
-  $('last-run').textContent='Analisis: '+new Date().toLocaleString('id');
-
-  document.getElementById('kpis').style.display='grid';
-  document.getElementById('dash').style.display='block';
-  document.getElementById('bandar-section').style.display='block';
-  document.getElementById('snap-section').style.display='block';
-
-  set('k-tv', tv?fB(tv):fB(tbuy+tsell)); set('k-tv2','Periode '+dfrom+' – '+dto);
-  const fc=fn>=0?'g':'r';
-  $('k-fn').textContent=(fn>=0?'+':'')+fB(fn); $('k-fn').className='kv '+fc; $('k-fn-c').className='kpi '+fc;
-  set('k-fn2', fn<0?'Asing net keluar':'Asing net masuk');
-  const pc=pchg>=0?'g':'r';
-  $('k-pc').textContent=(pr&&po)?(pchg>=0?'+':'')+pchg.toFixed(1)+'%':'—';
-  $('k-pc').className='kv '+(pr&&po?pc:'b'); $('k-pc-c').className='kpi '+(pr&&po?pc:'b');
-  set('k-pc2', (pr&&po)?fPt(pabs)+' poin | '+fN(po)+' → '+fN(pr):'Isi harga di tab Info Saham');
-  set('k-bc', buyers.length+''); set('k-bc2','+'+fB(tbuy)+' total');
-  set('k-sc', sellers.length+''); set('k-sc2','-'+fB(tsell)+' total');
-  const sig=getSig(fn,pchg,tbuy,tsell,BD);
-  set('k-sig', sig.l); set('k-sig2', sig.s);
-
-  buildFlow(BD); buildCat(BD); buildDonut(tbuy,tsell); buildCbar(BD);
-  buildLists(buyers,sellers,tbuy,tsell); buildTable(BD); buildSigs(fn,pchg,BD,sig);
-
-  const bandar = buildBandar(BD);
-  const atvFlags = buildATV(BD, atvThresh);
-  renderSnapshotList(); renderCompareSelects();
-
-  let vpaLatest = null;
-  if (VPA_DATA.length) {
-    document.getElementById('vpa-section').style.display='block';
-    vpaLatest = buildVPA(VPA_DATA);
-  } else {
-    document.getElementById('vpa-section').style.display='none';
-  }
-
-  buildConfluence(bandar, atvFlags, vpaLatest, whitelist, BD);
-
-  document.getElementById('kpis').scrollIntoView({behavior:'smooth'});
 }
 
 // ============================================================
 // SIGNAL ENGINE
 // ============================================================
-function getSig(fn,pct,buy,sell,data) {
+function getSig(fn,pct,data){
   const an=data.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
   const bn=data.filter(b=>b.cat==='B').reduce((s,b)=>s+b.net,0);
-  if (fn>0&&pct>0) return{l:'BULLISH',s:'Asing masuk + harga naik',t:'bull'};
-  if (fn>0&&pct<=0) return{l:'AKUMULASI',s:'Asing masuk, harga belum naik',t:'wat'};
-  if (fn<0&&pct<0&&an<0&&bn>0) return{l:'DISTRIBUSI',s:'Asing jual, lokal beli',t:'bear'};
-  if (fn<0&&pct<0) return{l:'BEARISH',s:'Outflow asing dominan',t:'bear'};
-  if (fn<0&&buy>Math.abs(fn)*0.8) return{l:'MIXED',s:'Lokal absorb tekanan asing',t:'wat'};
-  return {l:'SIDEWAYS',s:'Flow relatif seimbang',t:'neu'};
+  if(fn>0&&pct>0)return{l:'BULLISH',s:'Asing net masuk + harga naik. Momentum kuat.',t:'bull'};
+  if(fn>0&&pct<=0)return{l:'AKUMULASI',s:'Asing masuk meskipun harga masih melemah. Fase distribusi belum selesai atau awal akumulasi.',t:'wat'};
+  if(fn<0&&pct<0&&an<0&&bn>0)return{l:'DISTRIBUSI',s:'Asing net jual, lokal absorb. Pola transfer dari tangan kuat ke lemah.',t:'bear'};
+  if(fn<0&&pct>0)return{l:'DIVERGEN',s:'Harga naik tapi asing jual. Waspada bull trap — rally didorong ritel, bukan institusi.',t:'wat'};
+  if(fn<0&&pct<0)return{l:'BEARISH',s:'Tekanan jual asing dominan + harga turun. Hindari.',t:'bear'};
+  return{l:'SIDEWAYS',s:'Flow relatif seimbang tanpa trend jelas.',t:'neu'};
 }
 
 // ============================================================
-// CHARTS (existing)
+// MAIN RUN
 // ============================================================
-const TT={backgroundColor:'#1e232c',borderColor:'#2a3040',borderWidth:1,titleColor:'#e2e8f0',bodyColor:'#8899aa'};
+function run(){
+  const tk=($('m-tk').value||'SAHAM').toUpperCase();
+  const dfrom=$('m-from').value||'—',dto=$('m-to').value||'—';
+  const fnIn=parseFloat($('m-fn').value);
+  const tv=parseFloat($('m-tv').value)||0;
+  const pr=parseFloat($('m-pr').value)||0;
+  const po=parseFloat($('m-po').value)||0;
+  const atvT=parseFloat($('m-atv').value)||1;
+  const wl=($('m-wl').value||'').toUpperCase().split(',').map(s=>s.trim()).filter(Boolean);
+  const pchg=po?((pr-po)/po*100):0;
+  const buyers=BD.filter(b=>b.buy),sellers=BD.filter(b=>!b.buy);
+  const tBuy=buyers.reduce((s,b)=>s+b.net,0),tSell=sellers.reduce((s,b)=>s+Math.abs(b.net),0);
+  const fnAuto=BD.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
+  const fn=!isNaN(fnIn)?fnIn:fnAuto;
+  const sig=getSig(fn,pchg,BD);
 
-function buildFlow(data) {
+  // Header
+  set('h-tk',tk);set('h-pr',pr?fN(pr):'—');
+  $('h-chg').textContent=(pr&&po)?(pchg>=0?'+':'')+pchg.toFixed(2)+'%':'—';
+  $('h-chg').style.color=pchg>=0?'var(--g2)':'var(--r2)';
+  set('h-pd',dfrom+' → '+dto);
+  set('h-st','RUN '+new Date().toLocaleTimeString('id'));
+  const chip=$('h-sig-chip');chip.style.display='flex';
+  chip.innerHTML=`<span style="color:${sig.t==='bull'?'var(--g2)':sig.t==='bear'?'var(--r2)':'var(--am2)'};font-weight:600;font-family:var(--font-mono)">${sig.l}</span>`;
+
+  // KPIs
+  set('k-tv',tv?fB(tv):fB(tBuy+tSell));set('k-tv2','Periode '+dfrom+' – '+dto);
+  $('k-fn').textContent=(fn>=0?'+':'')+fB(fn);$('k-fn').className='kv '+(fn>=0?'g':'r');$('k-fn-c').className='kpi '+(fn>=0?'g':'r');
+  set('k-fn2',fn<0?'Asing net keluar':'Asing net masuk');
+  $('k-pc').textContent=(pr&&po)?(pchg>=0?'+':'')+pchg.toFixed(1)+'%':'—';$('k-pc').className='kv '+(pchg>=0?'g':'r');$('k-pc-c').className='kpi '+(pchg>=0?'g':'r');
+  set('k-pc2',(pr&&po)?fN(po)+' → '+fN(pr):'Isi harga di Info Saham');
+  set('k-bc',buyers.length+'');set('k-bc2','+'+fB(tBuy)+' total');
+  set('k-sc',sellers.length+'');set('k-sc2','-'+fB(tSell)+' total');
+
+  // Flow section KPIs
+  set('f-buy',fB(tBuy));set('f-sell',fB(tSell));
+  $('f-net').textContent=(tBuy-tSell>=0?'+':'')+fB(tBuy-tSell);$('f-net').className='kv '+(tBuy-tSell>=0?'g':'r');
+
+  // BUILD ALL
+  buildFlow(BD);buildCat(BD);buildDonut(tBuy,tSell);buildCbar(BD);
+  buildLists(buyers,sellers,tBuy,tSell);buildTable(BD);buildSigs(fn,pchg,BD,sig);
+  const bandar=buildBandar(BD);set('k-bi',bandar.pct.toFixed(0)+'%');set('k-bi2',bandar.pct>=60?'⚠ Konsentrasi tinggi':'Normal');
+  const atvFlags=buildATV(BD,atvT);
+  let vpaLatest=null;if(VD.length){buildVPA(VD);vpaLatest=VD[VD.length-1];}
+  buildDarkPool(DP);
+  buildConfluence(bandar,atvFlags,vpaLatest,wl,BD,fn,pchg);
+  renderSnapList();renderSnapSelects();
+}
+
+// ============================================================
+// CHARTS — FLOW
+// ============================================================
+function buildFlow(data){
   const s=[...data].sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,15);
   const v=s.map(b=>+b.net.toFixed(2));
-  const c=v.map(x=>x>=0?'rgba(0,208,132,.8)':'rgba(255,77,106,.8)');
+  const c=v.map(x=>x>=0?'rgba(46,160,67,.8)':'rgba(218,54,51,.8)');
   if(CHT.f)CHT.f.destroy();
-  CHT.f=new Chart($('ch-flow'),{type:'bar',
-    data:{labels:s.map(b=>b.c),datasets:[{data:v,backgroundColor:c,borderColor:c.map(x=>x.replace('.8','1')),borderWidth:1,borderRadius:3}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>(ctx.parsed.x>=0?'+':'')+ctx.parsed.x.toFixed(2)+' B',title:ctx=>s[ctx[0].dataIndex].c+' — '+s[ctx[0].dataIndex].n}}},
-      scales:{x:{grid:{color:'rgba(42,48,64,.8)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10},callback:fKT}},
-              y:{grid:{display:false},ticks:{color:'#8899aa',font:{family:'IBM Plex Mono',size:11,weight:'500'}}}}}});
+  CHT.f=new Chart($('ch-flow'),{type:'bar',data:{labels:s.map(b=>b.c),datasets:[{data:v,backgroundColor:c,borderColor:c.map(x=>x.replace('.8','1')),borderWidth:1,borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c2=>(c2.parsed.x>=0?'+':'')+c2.parsed.x.toFixed(2)+' B',title:c2=>s[c2[0].dataIndex].c+' — '+s[c2[0].dataIndex].n}}},scales:{x:{grid:{color:'rgba(33,40,58,.8)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10},callback:fKT}},y:{grid:{display:false},ticks:{color:'#8b949e',font:{family:'IBM Plex Mono',size:11,weight:'500'}}}}}});
 }
-function buildCat(data) {
+
+function buildCat(data){
   const cats=['A','B','C'];
   const bd=cats.map(c=>+(data.filter(b=>b.cat===c&&b.net>0).reduce((s,b)=>s+b.net,0).toFixed(2)));
   const sd=cats.map(c=>+((-data.filter(b=>b.cat===c&&b.net<0).reduce((s,b)=>s+Math.abs(b.net),0)).toFixed(2)));
   if(CHT.c)CHT.c.destroy();
-  CHT.c=new Chart($('ch-cat'),{type:'bar',
-    data:{labels:['A — Asing','B — Hybrid','C — Kecil'],datasets:[{label:'Buy',data:bd,backgroundColor:'rgba(0,208,132,.7)',borderRadius:3},{label:'Sell',data:sd,backgroundColor:'rgba(255,77,106,.7)',borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT}},
-      scales:{x:{grid:{color:'rgba(42,48,64,.5)'},ticks:{color:'#8899aa',font:{family:'IBM Plex Mono',size:10}}},
-              y:{grid:{color:'rgba(42,48,64,.5)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10},callback:fKT}}}}});
-  $('cat-sum').innerHTML=cats.map(c=>{
-    const net=data.filter(b=>b.cat===c).reduce((s,b)=>s+b.net,0), cnt=data.filter(b=>b.cat===c).length;
-    const col=net>0?'var(--green)':net<0?'var(--red)':'var(--tx2)';
-    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;font-family:'IBM Plex Mono',monospace">
-      <span style="width:16px;font-weight:600;color:${c==='A'?'var(--blue)':c==='B'?'var(--green)':'var(--tx2)'}">${c}</span>
-      <span style="color:${col};font-weight:500;width:90px">${net>=0?'+':''}${fB(net)}</span><span style="color:var(--tx3)">${cnt} broker</span></div>`;
-  }).join('');
+  CHT.c=new Chart($('ch-cat'),{type:'bar',data:{labels:['A — Asing','B — Hybrid','C — Kecil'],datasets:[{label:'Buy',data:bd,backgroundColor:'rgba(46,160,67,.7)',borderRadius:3},{label:'Sell',data:sd,backgroundColor:'rgba(218,54,51,.7)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT}},scales:{x:{grid:{color:'rgba(33,40,58,.5)'},ticks:{color:'#8b949e',font:{family:'IBM Plex Mono',size:10}}},y:{grid:{color:'rgba(33,40,58,.5)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10},callback:fKT}}}}});
+  $('cat-sum').innerHTML=cats.map(c=>{const net=data.filter(b=>b.cat===c).reduce((s,b)=>s+b.net,0),cnt=data.filter(b=>b.cat===c).length;const col=net>0?'var(--g2)':net<0?'var(--r2)':'var(--tx2)';return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;font-family:'IBM Plex Mono',monospace"><span style="width:16px;font-weight:600;color:${c==='A'?'var(--b2)':c==='B'?'var(--g2)':'var(--tx2)'}">${c}</span><span style="color:${col};font-weight:500;width:90px">${net>=0?'+':''}${fB(net)}</span><span style="color:var(--tx3)">${cnt} broker</span></div>`;}).join('');
 }
-function buildDonut(buy,sell) {
+
+function buildDonut(buy,sell){
   if(CHT.d)CHT.d.destroy();
-  CHT.d=new Chart($('ch-donut'),{type:'doughnut',
-    data:{labels:['Net Buy','Net Sell'],datasets:[{data:[+buy.toFixed(2),+sell.toFixed(2)],backgroundColor:['rgba(0,208,132,.7)','rgba(255,77,106,.7)'],borderColor:['#00d084','#ff4d6a'],borderWidth:1,hoverOffset:6}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>ctx.label+': '+fB(ctx.parsed)}}}}});
+  CHT.d=new Chart($('ch-donut'),{type:'doughnut',data:{labels:['Buy','Sell'],datasets:[{data:[+buy.toFixed(2),+sell.toFixed(2)],backgroundColor:['rgba(46,160,67,.75)','rgba(218,54,51,.75)'],borderColor:['#2ea043','#da3633'],borderWidth:1,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c2=>c2.label+': '+fB(c2.parsed)}}}}});
 }
-function buildCbar(data) {
-  const cats=['A','B','C'];
-  const v=cats.map(c=>+(data.filter(b=>b.cat===c).reduce((s,b)=>s+b.net,0).toFixed(2)));
-  const c=v.map(x=>x>=0?'rgba(0,208,132,.75)':'rgba(255,77,106,.75)');
+
+function buildCbar(data){
+  const cats=['A','B','C'];const v=cats.map(c=>+(data.filter(b=>b.cat===c).reduce((s,b)=>s+b.net,0).toFixed(2)));const c2=v.map(x=>x>=0?'rgba(46,160,67,.8)':'rgba(218,54,51,.8)');
   if(CHT.cb)CHT.cb.destroy();
-  CHT.cb=new Chart($('ch-cbar'),{type:'bar',
-    data:{labels:['A — Asing inst.','B — Hybrid','C — Kecil'],datasets:[{data:v,backgroundColor:c,borderColor:c.map(x=>x.replace('.75','1')),borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>(ctx.parsed.y>=0?'+':'')+fB(ctx.parsed.y)}}},
-      scales:{x:{grid:{display:false},ticks:{color:'#8899aa',font:{family:'IBM Plex Mono',size:10}}},y:{grid:{color:'rgba(42,48,64,.8)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10},callback:fKT}}}}});
+  CHT.cb=new Chart($('ch-cbar'),{type:'bar',data:{labels:['A — Asing','B — Hybrid','C — Kecil'],datasets:[{data:v,backgroundColor:c2,borderColor:c2.map(x=>x.replace('.8','1')),borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c3=>(c3.parsed.y>=0?'+':'')+fB(c3.parsed.y)}}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e',font:{family:'IBM Plex Mono',size:10}}},y:{grid:{color:'rgba(33,40,58,.8)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10},callback:fKT}}}}});
 }
 
 // ============================================================
-// LISTS + TABLE
+// LISTS + TABLE + SIGNALS
 // ============================================================
-function buildLists(buyers,sellers,tbuy,tsell) {
+function buildLists(buyers,sellers,tBuy,tSell){
   const tb=[...buyers].sort((a,b)=>b.net-a.net).slice(0,12);
   const ts=[...sellers].sort((a,b)=>a.net-b.net).slice(0,12);
-  const mb=tb[0]?tb[0].net:1, ms=ts[0]?Math.abs(ts[0].net):1;
-  $('b-buy').textContent='+'+fB(tbuy); $('b-sell').textContent='-'+fB(tsell);
-  $('list-buy').innerHTML=tb.map(b=>`<div class="fi fin"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf buy" style="width:${Math.min(100,(b.net/mb*100)).toFixed(0)}%"></div></div><span class="fa buy">+${fB(b.net)}</span></div>`).join('');
-  $('list-sell').innerHTML=ts.map(b=>`<div class="fi fin"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf sell" style="width:${Math.min(100,(Math.abs(b.net)/ms*100)).toFixed(0)}%"></div></div><span class="fa sell">-${fB(Math.abs(b.net))}</span></div>`).join('');
+  const mb=tb[0]?tb[0].net:1,ms=ts[0]?Math.abs(ts[0].net):1;
+  set('b-buy','+'+fB(tBuy));set('b-sell','-'+fB(tSell));
+  $('list-buy').innerHTML=tb.map(b=>`<div class="fi"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf buy" style="width:${Math.min(100,(b.net/mb*100)).toFixed(0)}%"></div></div><span class="fa buy">+${fB(b.net)}</span></div>`).join('');
+  $('list-sell').innerHTML=ts.map(b=>`<div class="fi"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><div class="fbt"><div class="fbf sell" style="width:${Math.min(100,(Math.abs(b.net)/ms*100)).toFixed(0)}%"></div></div><span class="fa sell">-${fB(Math.abs(b.net))}</span></div>`).join('');
 }
-function buildTable(data) { ROWS=[...data].sort((a,b)=>b.net-a.net); renderT(ROWS); }
-function renderT(data){
-  $('tbl-body').innerHTML=data.map(b=>`<tr>
-    <td style="color:${b.cat==='A'?'var(--blue)':b.cat==='B'?'var(--green)':'var(--tx3)'};font-weight:600">${b.c}</td>
-    <td style="color:var(--tx2)">${b.n}</td>
-    <td style="color:${b.cat==='A'?'var(--blue)':b.cat==='B'?'var(--green)':'var(--tx3)'}">${b.cat}</td>
-    <td class="${b.buy?'pos':'neg'}">${b.buy?'+':'-'}${fB(Math.abs(b.net))}</td>
-    <td><span class="badge ${b.buy?'buy':'sell'}">${b.buy?'BUY':'SELL'}</span></td></tr>`).join('');
-}
-function filterT(q){ if(!q){renderT(ROWS);return;} const ql=q.toLowerCase(); renderT(ROWS.filter(b=>b.c.toLowerCase().includes(ql)||b.n.toLowerCase().includes(ql))); }
 
-// ============================================================
-// SIGNALS TEXT
-// ============================================================
-function buildSigs(fn,pct,data,sig) {
-  const an=data.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0), bn=data.filter(b=>b.cat==='B').reduce((s,b)=>s+b.net,0);
-  const ts=[...data].sort((a,b)=>a.net-b.net)[0], tb=[...data].sort((a,b)=>b.net-a.net)[0];
+function buildTable(data){ROWS=[...data].sort((a,b)=>b.net-a.net);renderT(ROWS);}
+function renderT(data){
+  $('tbl-body').innerHTML=data.map(b=>{
+    const atv=b.freq>0?(b.nb+b.ns)/b.freq:null;
+    return`<tr>
+      <td style="color:${b.cat==='A'?'var(--b2)':b.cat==='B'?'var(--g2)':'var(--tx3)'};font-weight:600">${b.c}</td>
+      <td style="color:var(--tx2)">${b.n}</td>
+      <td style="color:${b.cat==='A'?'var(--b2)':b.cat==='B'?'var(--g2)':'var(--tx3)'}">${b.cat}</td>
+      <td class="${b.buy?'pos':'neg'}">${b.buy?'+':'-'}${fB(Math.abs(b.net))}</td>
+      <td style="color:var(--pu2)">${atv!==null?fB(atv):'—'}</td>
+      <td><span class="badge ${b.buy?'buy':'sell'}">${b.buy?'BUY':'SELL'}</span></td>
+    </tr>`;
+  }).join('');
+}
+function filterT(q){if(!q){renderT(ROWS);return;}const ql=q.toLowerCase();renderT(ROWS.filter(b=>b.c.toLowerCase().includes(ql)||b.n.toLowerCase().includes(ql)));}
+
+function buildSigs(fn,pct,data,sig){
+  const an=data.filter(b=>b.cat==='A').reduce((s,b)=>s+b.net,0);
+  const bn=data.filter(b=>b.cat==='B').reduce((s,b)=>s+b.net,0);
+  const ts=[...data].sort((a,b)=>a.net-b.net)[0],tb=[...data].sort((a,b)=>b.net-a.net)[0];
   let h=`<div class="sig ${sig.t}"><div class="sl">${sig.l}</div><div class="st">FNVal: ${fn>=0?'+':''}${fB(fn)} | Harga: ${pct?(pct>=0?'+':'')+pct.toFixed(1)+'%':'—'}</div></div>`;
-  if(an<0&&bn>0) h+=`<div class="sig bear"><div class="sl">Pola distribusi terdeteksi</div><div class="st">Kat. A (asing) net sell <strong>${fB(Math.abs(an))}</strong>, Kat. B (lokal) net buy <strong>${fB(bn)}</strong>. Tangan kuat melepas ke tangan lemah.</div></div>`;
-  else if(an>0&&bn>0) h+=`<div class="sig bull"><div class="sl">Konfluensi beli kuat</div><div class="st">Asing dan lokal sama-sama net buy.</div></div>`;
-  if(ts&&ts.net<0) h+=`<div class="sig neu"><div class="sl">Penjual dominan — ${ts.c}</div><div class="st">${ts.c} (${ts.n}) net sell <strong>${fB(Math.abs(ts.net))}</strong>.</div></div>`;
-  if(tb&&tb.net>0) h+=`<div class="sig neu"><div class="sl">Pembeli dominan — ${tb.c}</div><div class="st">${tb.c} (${tb.n}) net buy <strong>+${fB(tb.net)}</strong>.</div></div>`;
+  if(an<0&&bn>0)h+=`<div class="sig bear"><div class="sl">Pola Distribusi Terdeteksi</div><div class="st">Kat. A (asing) net sell <strong>${fB(Math.abs(an))}</strong>, Kat. B (lokal) net buy <strong>${fB(bn)}</strong>. Transfer dari tangan kuat ke lemah.</div></div>`;
+  else if(an>0&&bn>0)h+=`<div class="sig bull"><div class="sl">Konfluensi Beli Kuat</div><div class="st">Institusi asing dan lokal sama-sama net buy. Sinyal akumulasi terkoordinasi.</div></div>`;
+  if(ts&&ts.net<0)h+=`<div class="sig neu"><div class="sl">Penjual Dominan — ${ts.c}</div><div class="st">${ts.c} (${ts.n}) net sell <strong>${fB(Math.abs(ts.net))}</strong>.</div></div>`;
+  if(tb&&tb.net>0)h+=`<div class="sig neu"><div class="sl">Pembeli Dominan — ${tb.c}</div><div class="st">${tb.c} (${tb.n}) net buy <strong>+${fB(tb.net)}</strong>.</div></div>`;
   $('sig-area').innerHTML=h;
 }
 
 // ============================================================
-// BANDARMOLOGY CONCENTRATION
+// BANDARMOLOGY
 // ============================================================
-function buildBandar(data) {
+function buildBandar(data){
   const buyers=[...data.filter(b=>b.net>0)].sort((a,b)=>b.net-a.net);
   const totalBuy=buyers.reduce((s,b)=>s+b.net,0);
-  const top3=buyers.slice(0,3), top3Sum=top3.reduce((s,b)=>s+b.net,0);
-  const pct = totalBuy?(top3Sum/totalBuy*100):0;
-  const col = pct>=60?'var(--red)':pct>=40?'var(--amber)':'var(--green)';
+  const top3=buyers.slice(0,3),top3Sum=top3.reduce((s,b)=>s+b.net,0);
+  const top5=buyers.slice(0,5);
+  const pct=totalBuy?(top3Sum/totalBuy*100):0;
+  const col=pct>=60?'var(--r2)':pct>=40?'var(--am2)':'var(--g2)';
   const fill=$('bandar-fill');
-  fill.style.width=Math.min(100,pct).toFixed(1)+'%';
-  fill.style.background=col;
-  fill.textContent=pct.toFixed(1)+'%';
-  fill.style.color = pct>15 ? '#000' : 'var(--tx)';
-  $('bandar-detail').innerHTML = `<div style="margin-top:10px">` + top3.map(b=>`
-    <div class="fi"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><span class="fa buy">+${fB(b.net)}</span></div>
-  `).join('') + `<div style="font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:8px">Top 3 broker buy = ${fB(top3Sum)} dari total buy ${fB(totalBuy)}.${pct>=60?' <span style="color:var(--red)">⚠ Konsentrasi tinggi — indikasi akumulasi terorganisir.</span>':''}</div></div>`;
-  return { pct, top3, totalBuy };
+  fill.style.width=Math.min(100,pct).toFixed(1)+'%';fill.style.background=pct>=60?'#da3633':pct>=40?'#d29922':'#2ea043';
+  fill.textContent=pct.toFixed(1)+'%';fill.style.color=pct>15?'#000':'var(--tx)';
+  $('bandar-detail').innerHTML=`<div style="margin-top:10px">`+top3.map(b=>`<div class="fi"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}</span><span class="fa buy">+${fB(b.net)}</span></div>`).join('')+`<div style="font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:8px">Top 3 = ${fB(top3Sum)} dari total buy ${fB(totalBuy)}.${pct>=60?` <span style="color:var(--r2)">⚠ Konsentrasi tinggi — indikasi akumulasi terorganisir. VALID ENTRY SIGNAL.</span>`:''}</div></div>`;
+  // Bandar chart
+  if(CHT.bandar)CHT.bandar.destroy();
+  CHT.bandar=new Chart($('ch-bandar'),{type:'bar',data:{labels:top5.map(b=>b.c+'('+b.cat+')'),datasets:[{label:'Net Buy (B)',data:top5.map(b=>+b.net.toFixed(2)),backgroundColor:top5.map((_,i)=>i<3?'rgba(46,160,67,.85)':'rgba(31,111,235,.55)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c2=>'+'+fB(c2.parsed.y)+' B',title:c2=>top5[c2[0].dataIndex].n}}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e',font:{family:'IBM Plex Mono',size:11}}},y:{grid:{color:'rgba(33,40,58,.8)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10},callback:fKT}}}}});
+  return{pct,top3,totalBuy};
 }
 
 // ============================================================
-// ATV / HNWI DETECTOR
+// ATV / HNWI
 // ============================================================
-function buildATV(data, threshold) {
-  const withFreq = data.filter(b=>b.freq>0).map(b=>({...b, atv:(b.nb+b.ns)/b.freq}));
-  const flagged = withFreq.filter(b=>b.atv>=threshold).sort((a,b)=>b.atv-a.atv);
-  $('atv-count').textContent = flagged.length+' flagged';
-  if (!withFreq.length) {
-    $('atv-list').innerHTML = `<div class="snap-empty">Belum ada data frekuensi. Isi tab "Paste TSV" bagian Data Frekuensi atau kolom Freq di Manual Entry untuk mengaktifkan ATV Detector.</div>`;
-    return [];
-  }
-  const maxAtv = Math.max(...withFreq.map(b=>b.atv), 0.01);
-  $('atv-list').innerHTML = withFreq.sort((a,b)=>b.atv-a.atv).slice(0,15).map(b=>{
-    const isFlag = b.atv>=threshold;
-    return `<div class="fi fin">
-      <span class="fc ${b.cat}">${b.c}</span>
-      <span class="fn">${b.n}${isFlag&&b.cat!=='A'?' <span class="badge warn" style="margin-left:4px">HNWI?</span>':''}</span>
-      <div class="fbt"><div class="fbf atv" style="width:${Math.min(100,(b.atv/maxAtv*100)).toFixed(0)}%"></div></div>
-      <span class="fa atv">${fB(b.atv)}/tx</span>
-    </div>`;
-  }).join('');
+function buildATV(data,threshold){
+  const withFreq=data.filter(b=>b.freq>0).map(b=>({...b,atv:(b.nb+b.ns)/b.freq}));
+  const flagged=withFreq.filter(b=>b.atv>=threshold).sort((a,b)=>b.atv-a.atv);
+  set('atv-count',flagged.length+' flagged');
+  if(!withFreq.length){$('atv-list').innerHTML=`<div class="alert ai">Belum ada data frekuensi. Isi bagian Frekuensi di Paste TSV atau kolom Freq di Manual Entry.</div>`;return[];}
+  const maxAtv=Math.max(...withFreq.map(b=>b.atv),.01);
+  $('atv-list').innerHTML=withFreq.sort((a,b)=>b.atv-a.atv).slice(0,15).map(b=>{const isF=b.atv>=threshold;return`<div class="fi"><span class="fc ${b.cat}">${b.c}</span><span class="fn">${b.n}${isF&&b.cat!=='A'?' <span class="badge warn">HNWI?</span>':isF?' <span class="badge info">INST</span>':''}</span><div class="fbt"><div class="fbf atv" style="width:${Math.min(100,(b.atv/maxAtv*100)).toFixed(0)}%"></div></div><span class="fa atv">${fB(b.atv)}/tx</span></div>`;}).join('');
+  // ATV chart
+  const topATV=withFreq.sort((a,b)=>b.atv-a.atv).slice(0,12);
+  if(CHT.atv)CHT.atv.destroy();
+  CHT.atv=new Chart($('ch-atv'),{type:'bar',data:{labels:topATV.map(b=>b.c),datasets:[{label:'ATV (B/tx)',data:topATV.map(b=>+b.atv.toFixed(3)),backgroundColor:topATV.map(b=>b.atv>=threshold?'rgba(163,113,247,.85)':'rgba(33,40,58,.8)'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c2=>fB(c2.parsed.y)+' per transaksi',title:c2=>topATV[c2[0].dataIndex].n}}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e',font:{family:'IBM Plex Mono',size:11}}},y:{grid:{color:'rgba(33,40,58,.8)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10}}}}}});
   return flagged;
 }
 
 // ============================================================
-// VPA QUADRANT
+// VPA
 // ============================================================
-function buildVPA(data) {
-  const counts = {markup:0,exh:0,abs:0,mkd:0};
-  data.forEach(d=>counts[d.cls]++);
-  $('qc-markup').textContent=counts.markup; $('qc-exh').textContent=counts.exh;
-  $('qc-abs').textContent=counts.abs; $('qc-mkd').textContent=counts.mkd;
-
-  const latest = data[data.length-1];
-  const latestBox = latest ? `<div class="sig ${latest.cls==='markup'?'bull':latest.cls==='mkd'?'bear':latest.cls==='exh'?'wat':'neu'}" style="margin-top:12px">
-    <div class="sl">Hari terakhir (${latest.date}): ${VPA_LABEL[latest.cls]}</div>
-    <div class="st">ΔPrice ${latest.pctP>=0?'+':''}${latest.pctP.toFixed(1)}% | ΔVolume ${latest.pctV>=0?'+':''}${latest.pctV.toFixed(1)}%. ${
-      latest.cls==='exh' ? 'Harga naik tapi volume mengecil — waspada Bull Trap, market maker bisa menarik likuiditas.' :
-      latest.cls==='abs' ? 'Harga turun tapi volume kering — kemungkinan healthy retracement, institusi sedang menadah barang.' :
-      latest.cls==='mkd' ? 'Harga turun dengan volume tinggi — indikasi distribusi/markdown nyata.' :
-      'Harga naik dengan volume naik — markup yang valid, partisipasi pasar mengonfirmasi tren.'
-    }</div></div>` : '';
-  $('vpa-latest').innerHTML = latestBox;
-
-  if (CHT.vpa) CHT.vpa.destroy();
-  CHT.vpa = new Chart($('ch-vpa'), {
-    type:'scatter',
-    data:{ datasets:[{
-      data: data.map(d=>({x:+d.pctV.toFixed(1), y:+d.pctP.toFixed(1), label:d.date, cls:d.cls})),
-      backgroundColor: data.map(d=>VPA_COLOR[d.cls]),
-      pointRadius:7, pointHoverRadius:9,
-    }]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{
-        title:ctx=>ctx[0].raw.label,
-        label:ctx=>[VPA_LABEL[ctx.raw.cls],'ΔPrice: '+ctx.raw.y+'% | ΔVol: '+ctx.raw.x+'%']
-      }}},
-      scales:{
-        x:{title:{display:true,text:'Δ Volume (%)',color:'#8899aa',font:{family:'IBM Plex Mono',size:10}},grid:{color:'rgba(42,48,64,.6)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10}}},
-        y:{title:{display:true,text:'Δ Price (%)',color:'#8899aa',font:{family:'IBM Plex Mono',size:10}},grid:{color:'rgba(42,48,64,.6)'},ticks:{color:'#556070',font:{family:'IBM Plex Mono',size:10}}}
-      }}
-  });
-
-  $('vpa-table').innerHTML = `<table class="dt"><thead><tr><th style="text-align:left">Tanggal</th><th>ΔPrice</th><th>ΔVol</th><th style="text-align:left">Klasifikasi</th></tr></thead><tbody>`+
-    data.map(d=>`<tr><td>${d.date}</td><td class="${d.pctP>=0?'pos':'neg'}">${d.pctP>=0?'+':''}${d.pctP.toFixed(1)}%</td><td class="${d.pctV>=0?'pos':'neg'}">${d.pctV>=0?'+':''}${d.pctV.toFixed(1)}%</td><td><span class="badge" style="background:${VPA_COLOR[d.cls]}22;color:${VPA_COLOR[d.cls]}">${VPA_LABEL[d.cls]}</span></td></tr>`).join('')+
-    `</tbody></table>`;
-
-  return latest;
+function buildVPA(data){
+  const counts={markup:0,exh:0,abs:0,mkd:0};data.forEach(d=>counts[d.cls]++);
+  set('qc-mk',counts.markup);set('qc-ex',counts.exh);set('qc-ab',counts.abs);set('qc-md',counts.mkd);
+  const latest=data[data.length-1];
+  if(latest){
+    const typeMap={bull:'bull',bear:'bear',wat:'wat',neu:'neu'};
+    const clsMap={markup:'bull',exh:'wat',abs:'neu',mkd:'bear'};
+    const desc={exh:'Harga naik tapi volume mengecil — waspada Bull Trap, exhaustion.',abs:'Harga turun dengan volume kering — institusi sedang menadah. Healthy retracement.',mkd:'Harga turun dengan volume tinggi — distribusi nyata. HINDARI.',markup:'Harga naik + volume naik — markup valid, partisipasi kuat.'};
+    $('vpa-latest').innerHTML=`<div class="sig ${clsMap[latest.cls]}" style="margin-top:10px"><div class="sl">Hari Terakhir (${latest.date}): ${VLB[latest.cls]}</div><div class="st">ΔPrice ${latest.pctP>=0?'+':''}${latest.pctP.toFixed(1)}% | ΔVolume ${latest.pctV>=0?'+':''}${latest.pctV.toFixed(1)}%<br>${desc[latest.cls]}</div></div>`;
+  }
+  if(CHT.vpa)CHT.vpa.destroy();
+  CHT.vpa=new Chart($('ch-vpa'),{type:'scatter',data:{datasets:[{data:data.map(d=>({x:+d.pctV.toFixed(1),y:+d.pctP.toFixed(1),label:d.date,cls:d.cls})),backgroundColor:data.map(d=>VCL[d.cls]),pointRadius:8,pointHoverRadius:11}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{title:c2=>c2[0].raw.label,label:c2=>[VLB[c2.raw.cls],'ΔP: '+c2.raw.y+'% | ΔV: '+c2.raw.x+'%']}}},scales:{x:{title:{display:true,text:'Δ Volume (%)',color:'#8b949e',font:{family:'IBM Plex Mono',size:10}},grid:{color:'rgba(33,40,58,.6)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10}}},y:{title:{display:true,text:'Δ Price (%)',color:'#8b949e',font:{family:'IBM Plex Mono',size:10}},grid:{color:'rgba(33,40,58,.6)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10}}}}}});
+  $('vpa-table').innerHTML=`<table class="dt"><thead><tr><th style="text-align:left">Tanggal</th><th>ΔPrice</th><th>ΔVol</th><th style="text-align:left">Status</th></tr></thead><tbody>`+data.map(d=>`<tr><td>${d.date}</td><td class="${d.pctP>=0?'pos':'neg'}">${d.pctP>=0?'+':''}${d.pctP.toFixed(1)}%</td><td class="${d.pctV>=0?'pos':'neg'}">${d.pctV>=0?'+':''}${d.pctV.toFixed(1)}%</td><td><span class="badge" style="background:${VCL[d.cls]}22;color:${VCL[d.cls]}">${VLB[d.cls]}</span></td></tr>`).join('')+`</tbody></table>`;
 }
 
 // ============================================================
-// SNAPSHOT MANAGER
+// DARK POOL
 // ============================================================
-function saveSnapshot() {
-  if (!BD.length) { alert('Belum ada data untuk disimpan. Jalankan analisis dulu.'); return; }
-  const label = $('snap-label').value.trim() || ('Snapshot '+(SNAPSHOTS.length+1));
-  SNAPSHOTS.push({ id:Date.now(), label, ts:new Date().toLocaleString('id'), data:JSON.parse(JSON.stringify(BD)) });
-  $('snap-label').value='';
-  renderSnapshotList(); renderCompareSelects();
-}
-function deleteSnapshot(id) { SNAPSHOTS = SNAPSHOTS.filter(s=>s.id!==id); renderSnapshotList(); renderCompareSelects(); }
-function renderSnapshotList() {
-  const el = $('snap-list');
-  if (!SNAPSHOTS.length) { el.innerHTML=''; el.className='snap-empty'; el.textContent='Belum ada snapshot tersimpan.'; return; }
-  el.className=''; el.innerHTML = SNAPSHOTS.map(s=>`<span class="snap-chip">${s.label} <span class="ts">${s.ts}</span>
-    <span class="x" onclick="exportSnapshot(${s.id})" title="Export">⬇</span>
-    <span class="x" onclick="deleteSnapshot(${s.id})" title="Hapus">✕</span></span>`).join('');
-}
-function renderCompareSelects() {
-  ['snap-before','snap-after'].forEach(id=>{
-    const sel = $(id); const cur = sel.value;
-    sel.innerHTML = '<option value="">— pilih —</option>' + SNAPSHOTS.map(s=>`<option value="${s.id}">${s.label} (${s.ts})</option>`).join('');
-    sel.value = cur;
-  });
-}
-function exportSnapshot(id) {
-  const s = SNAPSHOTS.find(x=>x.id===id); if (!s) return;
-  downloadJSON([s], 'snapshot_'+s.label.replace(/\s+/g,'_')+'.json');
-}
-function exportAllSnapshots() {
-  if (!SNAPSHOTS.length) { alert('Tidak ada snapshot untuk di-export.'); return; }
-  downloadJSON(SNAPSHOTS, 'broker_snapshots_'+new Date().toISOString().slice(0,10)+'.json');
-}
-function downloadJSON(obj, filename) {
-  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-function importSnapshotFile(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      const arr = Array.isArray(parsed) ? parsed : [parsed];
-      arr.forEach(s => { if (s.label && s.data) SNAPSHOTS.push({...s, id: s.id || Date.now()+Math.random()}); });
-      renderSnapshotList(); renderCompareSelects();
-      alert(arr.length+' snapshot berhasil di-import.');
-    } catch(err) { alert('Gagal membaca file JSON: '+err.message); }
-  };
-  reader.readAsText(file);
-  input.value='';
-}
-function compareSnapshots() {
-  const id1 = $('snap-before').value, id2 = $('snap-after').value;
-  if (!id1 || !id2) { alert('Pilih kedua snapshot (Before & After) dulu.'); return; }
-  const s1 = SNAPSHOTS.find(s=>s.id==id1), s2 = SNAPSHOTS.find(s=>s.id==id2);
-  if (!s1 || !s2) return;
-  const whitelist = ($('m-whitelist').value||'').toUpperCase().split(',').map(s=>s.trim()).filter(Boolean);
-
-  const codes = new Set([...s1.data.map(b=>b.c), ...s2.data.map(b=>b.c)]);
-  const rows = [...codes].map(c => {
-    const b1 = s1.data.find(b=>b.c===c), b2 = s2.data.find(b=>b.c===c);
-    const net1 = b1?b1.net:0, net2 = b2?b2.net:0;
-    const cat = (b2||b1)?.cat || 'B';
-    const name = (b2||b1)?.n || c;
-    return { c, n:name, cat, net1, net2, delta: net2-net1, isWl: whitelist.includes(c) };
-  }).sort((a,b)=>b.delta-a.delta);
-
-  const top = rows.slice(0,20);
-  $('compare-result').innerHTML = `
-    <div style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin:12px 0 8px">
-      ${s1.label} → ${s2.label} — diurutkan berdasarkan akselerasi net buy (delta terbesar)
-    </div>
-    <div class="sy" style="max-height:320px">
-    <table class="dt"><thead><tr><th style="text-align:left">Kode</th><th style="text-align:left">Nama</th><th>Net ${s1.label}</th><th>Net ${s2.label}</th><th>Δ Delta</th></tr></thead><tbody>
-    ${top.map(r=>`<tr style="${r.isWl?'background:rgba(167,139,250,0.06)':''}">
-      <td style="font-weight:600">${r.c}${r.isWl?' <span class="badge pur">WL</span>':''}</td>
-      <td style="color:var(--tx2)">${r.n}</td>
-      <td class="${r.net1>=0?'pos':'neg'}">${(r.net1>=0?'+':'')+fB(r.net1)}</td>
-      <td class="${r.net2>=0?'pos':'neg'}">${(r.net2>=0?'+':'')+fB(r.net2)}</td>
-      <td class="${r.delta>=0?'pos':'neg'}" style="font-weight:600">${(r.delta>=0?'+':'')+fB(r.delta)}</td>
-    </tr>`).join('')}
-    </tbody></table></div>`;
+function buildDarkPool(rows){
+  set('dp-count',rows.length+' crossing');
+  if(!rows.length){$('dp-results').innerHTML=`<div class="alert ai">Belum ada data dark pool. Isi di tab Dark Pool pada form input.</div>`;if(CHT.dp){CHT.dp.destroy();CHT.dp=null;}return;}
+  $('dp-results').innerHTML=rows.map(r=>{
+    const isBull=r.delta>2,isBear=r.delta<0;
+    const cls=isBull?'bull':isBear?'bear':'neu';
+    const verdict=isBull?'✅ Premium Cross — Institusi akumulasi agresif':isBear?'❌ Discount Cross — Insider bailout / tukar guling. EXIT SIGNAL.':'⚠️ Neutral — Crossing tipis, tidak konklusif';
+    return`<div class="sig ${cls}" style="margin-bottom:8px"><div class="sl">${r.date} — ${r.tk} | Delta: ${r.delta>=0?'+':''}${r.delta.toFixed(2)}%</div><div class="st">Nego: Rp${fN(r.nego)} vs Pasar: Rp${fN(r.mkt)}<br>${verdict}</div></div>`;
+  }).join('');
+  if(CHT.dp)CHT.dp.destroy();
+  CHT.dp=new Chart($('ch-dp'),{type:'bar',data:{labels:rows.map(r=>r.date+' '+r.tk),datasets:[{label:'Delta (%)',data:rows.map(r=>+r.delta.toFixed(2)),backgroundColor:rows.map(r=>r.delta>2?'rgba(46,160,67,.8)':r.delta<0?'rgba(218,54,51,.8)':'rgba(210,153,34,.6)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c2=>(c2.parsed.y>=0?'+':'')+c2.parsed.y.toFixed(2)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e',font:{family:'IBM Plex Mono',size:10}}},y:{title:{display:true,text:'Delta (%)',color:'#8b949e',font:{family:'IBM Plex Mono',size:10}},grid:{color:'rgba(33,40,58,.8)'},ticks:{color:'#484f58',font:{family:'IBM Plex Mono',size:10}}}}}});
 }
 
 // ============================================================
-// CONFLUENCE SIGNAL
+// CONFLUENCE
 // ============================================================
-function buildConfluence(bandar, atvFlags, vpaLatest, whitelist, data) {
-  document.getElementById('confluence-panel').style.display='block';
-  const cond1 = bandar.pct >= 60;
-  const flaggedBuyers = atvFlags.filter(b=>b.net>0);
-  const cond2 = flaggedBuyers.length > 0;
-  const cond3 = vpaLatest ? vpaLatest.cls==='markup' : null; // null = no data
+function buildConfluence(bandar,atvFlags,vpaLatest,wl,data,fn,pchg){
+  const cond1=bandar.pct>=60;
+  const flaggedBuyers=atvFlags.filter(b=>b.net>0);
+  const cond2=flaggedBuyers.length>0;
+  const cond3=vpaLatest?vpaLatest.cls==='markup':null;
+  const dpPremium=DP.filter(r=>r.delta>2).length;const dpBailout=DP.filter(r=>r.delta<0).length;
+  const cond4=DP.length>0?(dpPremium>0&&dpBailout===0):null;
+  const wlBuyers=wl.length?data.filter(b=>wl.includes(b.c)&&b.net>0):[];
+  const cond5=wl.length?wlBuyers.length>0:null;
+  const cond6=fn<0&&pchg<0?null:fn>0;
 
-  const wlBuyers = whitelist.length ? data.filter(b=>whitelist.includes(b.c) && b.net>0) : [];
-  const cond4 = whitelist.length ? wlBuyers.length>0 : null;
-
-  const conds = [
-    { ok:cond1, label:'Bandarmology Index ≥60%', detail: bandar.pct.toFixed(1)+'% top-3 buy concentration' },
-    { ok:cond2, label:'ATV Detector: HNWI buyer terdeteksi', detail: flaggedBuyers.length+' broker flagged sebagai net buyer' },
-    { ok:cond3, label:'VPA hari terakhir = Markup (Valid)', detail: vpaLatest?VPA_LABEL[vpaLatest.cls]:'Data VPA belum diisi' },
+  const conds=[
+    {ok:cond1,label:'Bandarmology Index ≥60%',detail:bandar.pct.toFixed(1)+'% top-3 concentration',icon:'🎯'},
+    {ok:cond2,label:'ATV: HNWI buyer terdeteksi',detail:flaggedBuyers.length+' broker flagged net buy',icon:'🔍'},
+    {ok:cond3,label:'VPA: Markup valid (hari terakhir)',detail:vpaLatest?VLB[vpaLatest.cls]:'Belum ada data VPA',icon:'📊'},
+    {ok:cond4,label:'Dark Pool: Premium cross (bukan bailout)',detail:DP.length?dpPremium+' premium, '+dpBailout+' bailout':'Belum ada data dark pool',icon:'🌑'},
+    {ok:cond5,label:'Whitelist broker net buy',detail:wlBuyers.map(b=>b.c).join(', ')||'Tidak ada whitelist net buy',icon:'✅'},
+    {ok:cond6,label:'FNVal positif (asing net masuk)',detail:(fn>=0?'+':'')+fB(fn),icon:'🌏'},
   ];
-  if (whitelist.length) conds.push({ ok:cond4, label:'Whitelist broker net buy', detail: wlBuyers.map(b=>b.c).join(', ')||'Tidak ada whitelist yang net buy' });
 
-  const metCount = conds.filter(c=>c.ok===true).length;
-  const totalActive = conds.filter(c=>c.ok!==null).length;
-  const verdict = metCount===totalActive && totalActive>0 ? 'bull' : metCount>0 ? 'wat' : 'neu';
-  const verdictLabel = metCount===totalActive && totalActive>0 ? 'KONFLUENSI TERPENUHI' : metCount>0 ? 'KONFLUENSI SEBAGIAN' : 'BELUM ADA KONFLUENSI';
+  const active=conds.filter(c=>c.ok!==null);
+  const met=active.filter(c=>c.ok===true).length;
+  const score=active.length?Math.round(met/active.length*100):0;
+  const color=score>=80?'#2ea043':score>=60?'#d29922':'#da3633';
+  const verdict=score>=80?'bull':score>=60?'wat':'neu';
+  const label=score>=80?'FULL CONFLUENCE — ENTRY VALID':score>=60?'PARTIAL CONFLUENCE — Hati-hati':'SINYAL LEMAH — Tunggu konfirmasi';
 
-  $('confluence-body').innerHTML = `
-    <div class="sig ${verdict}"><div class="sl">${verdictLabel}</div><div class="st">${metCount}/${totalActive} kondisi terpenuhi. Confluence Scoring ini meniru Step 3 blueprint — sinyal entry idealnya HANYA dipertimbangkan ketika semua variabel berpotongan.</div></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px">
-    ${conds.map(c=>`<div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:6px;padding:10px 12px">
-      <div style="font-size:16px">${c.ok===true?'✅':c.ok===false?'❌':'➖'}</div>
-      <div style="font-size:11px;color:var(--tx);font-weight:500;margin-top:4px">${c.label}</div>
-      <div style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-top:3px">${c.detail}</div>
-    </div>`).join('')}
-    </div>`;
+  set('conf-count',met+'/'+active.length+' terpenuhi');
+  set('ring-num',score+'%');
+  const ring=$('ring-fill');ring.style.stroke=color;
+  const circumference=314;ring.style.strokeDashoffset=(circumference-(score/100*circumference)).toFixed(1);
+
+  $('cond-grid').innerHTML=conds.map(c=>`<div class="cond-item"><div class="cond-ic">${c.ok===true?'✅':c.ok===false?'❌':'➖'}</div><div class="cond-n">${c.icon} ${c.label}</div><div class="cond-d">${c.detail}</div></div>`).join('');
+  $('conf-verdict').innerHTML=`<div class="sig ${verdict}" style="margin-top:10px"><div class="sl">${label}</div><div class="st">${met}/${active.length} kondisi terpenuhi (${score}%). ${score>=80?'Semua sinyal sejajar — posisi dapat diambil sesuai manajemen risiko.':score>=60?'Sebagian sinyal positif — pertimbangkan posisi kecil dulu, tunggu konfirmasi tambahan.':'Tidak cukup konfluensi — tunggu sampai lebih banyak kondisi terpenuhi sebelum entry.'}</div></div>`;
 }
 
 // ============================================================
-// HELPERS
+// SNAPSHOT
 // ============================================================
-function $(id){ return document.getElementById(id); }
-function set(id,v){ $(id).textContent=v; }
-function fB(v){ const a=Math.abs(v); if(a>=1000) return (a/1000).toFixed(2)+' T'; if(a>=1) return a.toFixed(2)+' B'; if(a>=0.001) return (a*1000).toFixed(1)+' M'; return (a*1e6).toFixed(0)+' jt'; }
-function fN(v){ return v?v.toLocaleString('id'):'—'; }
-function fPt(v){ return (v>=0?'+':'')+v.toLocaleString('id'); }
-function fKT(v){ const a=Math.abs(v); if(a>=1000) return (v<0?'-':'')+Math.abs(v/1000).toFixed(1)+'T'; return (v<0?'-':'')+Math.abs(v).toFixed(0)+'B'; }
+function saveSnap(){
+  if(!BD.length){alert('Belum ada data. Jalankan analisis dulu.');return;}
+  const lbl=$('snap-lbl').value.trim()||('Snap '+( SNAPS.length+1));
+  SNAPS.push({id:Date.now(),label:lbl,ts:new Date().toLocaleString('id'),data:JSON.parse(JSON.stringify(BD))});
+  $('snap-lbl').value='';renderSnapList();renderSnapSelects();
+}
+function deleteSnap(id){SNAPS=SNAPS.filter(s=>s.id!==id);renderSnapList();renderSnapSelects();}
+function renderSnapList(){
+  const el=$('snap-list');
+  if(!SNAPS.length){el.innerHTML='<span style="color:var(--tx3);font-family:\'IBM Plex Mono\',monospace;font-size:11px">Belum ada snapshot.</span>';return;}
+  el.innerHTML=SNAPS.map(s=>`<span class="snap-chip">${s.label} <span class="ts">${s.ts}</span><span class="x" onclick="exportSnap(${s.id})" title="Export">⬇</span><span class="x" onclick="deleteSnap(${s.id})" title="Hapus">✕</span></span>`).join('');
+}
+function renderSnapSelects(){
+  ['snap-before','snap-after'].forEach(id=>{const sel=$(id);const cur=sel.value;sel.innerHTML='<option value="">— pilih —</option>'+SNAPS.map(s=>`<option value="${s.id}">${s.label} (${s.ts})</option>`).join('');sel.value=cur;});
+}
+function exportSnap(id){const s=SNAPS.find(x=>x.id===id);if(!s)return;dlJSON([s],'snap_'+s.label.replace(/\s+/g,'_')+'.json');}
+function exportSnaps(){if(!SNAPS.length){alert('Tidak ada snapshot.');return;}dlJSON(SNAPS,'bfa_snapshots_'+new Date().toISOString().slice(0,10)+'.json');}
+function dlJSON(obj,fn){const b=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
+function importSnap(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const p=JSON.parse(e.target.result);const arr=Array.isArray(p)?p:[p];arr.forEach(s=>{if(s.label&&s.data)SNAPS.push({...s,id:s.id||Date.now()+Math.random()});});renderSnapList();renderSnapSelects();alert(arr.length+' snapshot berhasil di-import.');}catch(err){alert('Gagal: '+err.message);}};r.readAsText(f);input.value='';}
+function compareSnaps(){
+  const id1=$('snap-before').value,id2=$('snap-after').value;
+  if(!id1||!id2){alert('Pilih kedua snapshot dulu.');return;}
+  const s1=SNAPS.find(s=>s.id==id1),s2=SNAPS.find(s=>s.id==id2);if(!s1||!s2)return;
+  const wl=($('m-wl').value||'').toUpperCase().split(',').map(s=>s.trim()).filter(Boolean);
+  const codes=new Set([...s1.data.map(b=>b.c),...s2.data.map(b=>b.c)]);
+  const rows=[...codes].map(c=>{
+    const b1=s1.data.find(b=>b.c===c),b2=s2.data.find(b=>b.c===c);
+    const net1=b1?b1.net:0,net2=b2?b2.net:0;
+    const name=(b2||b1)?.n||c,cat=(b2||b1)?.cat||'B';
+    return{c,n:name,cat,net1,net2,delta:net2-net1,isWl:wl.includes(c)};
+  }).sort((a,b)=>b.delta-a.delta);
+  $('compare-result').innerHTML=`<div style="font-size:10px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin:12px 0 8px">${s1.label} → ${s2.label} | Urutkan: akselerasi akumulasi (delta terbesar)</div><div class="sy" style="max-height:340px"><table class="dt"><thead><tr><th style="text-align:left">Kode</th><th style="text-align:left">Nama</th><th>Net Before</th><th>Net After</th><th>Δ Delta</th></tr></thead><tbody>${rows.slice(0,20).map(r=>`<tr class="${r.delta>=50?'dark-trap-pos':r.delta<=-50?'dark-trap-row':''}"><td style="font-weight:600;color:${r.cat==='A'?'var(--b2)':r.cat==='B'?'var(--g2)':'var(--tx3)'}">${r.c}${r.isWl?' <span class="badge pur">WL</span>':''}</td><td>${r.n}</td><td class="${r.net1>=0?'pos':'neg'}">${(r.net1>=0?'+':'')+fB(r.net1)}</td><td class="${r.net2>=0?'pos':'neg'}">${(r.net2>=0?'+':'')+fB(r.net2)}</td><td class="${r.delta>=0?'pos':'neg'}" style="font-weight:600">${(r.delta>=0?'+':'')+fB(r.delta)}</td></tr>`).join('')}</tbody></table></div>`;
+}
 
 // ============================================================
 // INIT
 // ============================================================
-window.onload = function() { clearManual(); };
+window.onload=function(){
+  for(let i=0;i<6;i++)addMRow();
+  addDPRow();
+  sw('paste');window._activeTab='paste';
+};
 </script>
 </body>
 </html>
